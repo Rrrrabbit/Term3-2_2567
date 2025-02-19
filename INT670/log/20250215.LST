@@ -1,0 +1,1030 @@
+SQL> spool C:\Users\Administrator\Documents\INT670\20250215
+SQL> 
+SQL> -- 15 Feb 2025
+SQL> create table a1
+  2  (a11 number(5) constraint a1_a11_nn not null, a12 number(5));
+
+Table created.
+
+SQL> select * from a1;
+
+no rows selected
+
+SQL> insert into a1 values (1,2);
+
+1 row created.
+
+SQL> insert into a1 values (2,3);
+
+1 row created.
+
+SQL> select * from a1;
+
+       A11        A12                                                                                                   
+---------- ----------                                                                                                   
+         1          2                                                                                                   
+         2          3                                                                                                   
+
+SQL> commit;
+
+Commit complete.
+
+SQL> alter table a1 disable validate constraint a1_a11_nn;
+
+Table altered.
+
+SQL> insert into a1 values (null,3);
+insert into a1 values (null,3)
+*
+ERROR at line 1:
+ORA-25128: No insert/update/delete on table with constraint (OSQLN01.A1_A11_NN) disabled and validated 
+
+
+SQL> alter table a1 enable validate constraint a1_a11_nn;
+
+Table altered.
+
+SQL> insert into a1 values (null,3);
+insert into a1 values (null,3)
+                       *
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("OSQLN01"."A1"."A11") 
+
+
+SQL> alter table a1 disable novalidate constraint a1_a11_nn;
+
+Table altered.
+
+SQL> insert into a1 values (null,3);
+
+1 row created.
+
+SQL> select * from a1;
+
+       A11        A12                                                                                                   
+---------- ----------                                                                                                   
+         1          2                                                                                                   
+         2          3                                                                                                   
+                    3                                                                                                   
+
+SQL> alter table a1 enable validate constraint a1_a11_nn;
+alter table a1 enable validate constraint a1_a11_nn
+                                          *
+ERROR at line 1:
+ORA-02293: cannot validate (OSQLN01.A1_A11_NN) - check constraint violated 
+
+
+SQL> alter table a1 enable novalidate constraint a1_a11_nn;
+
+Table altered.
+
+SQL> select * from a1;
+
+       A11        A12                                                                                                   
+---------- ----------                                                                                                   
+         1          2                                                                                                   
+         2          3                                                                                                   
+                    3                                                                                                   
+
+SQL> insert into a1 values (null,4);
+insert into a1 values (null,4)
+                       *
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("OSQLN01"."A1"."A11") 
+
+
+SQL> desc a1;
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ A11                                                                        NUMBER(5)
+ A12                                                                        NUMBER(5)
+
+SQL> alter table a1 enable validate constraint a1_a11_nn;
+alter table a1 enable validate constraint a1_a11_nn
+                                          *
+ERROR at line 1:
+ORA-02293: cannot validate (OSQLN01.A1_A11_NN) - check constraint violated 
+
+
+SQL> select * from a1;
+
+       A11        A12                                                                                                   
+---------- ----------                                                                                                   
+         1          2                                                                                                   
+         2          3                                                                                                   
+                    3                                                                                                   
+
+SQL> update a1 set a11 = 4 where a12 = 3;
+
+2 rows updated.
+
+SQL> select * from a1;
+
+       A11        A12                                                                                                   
+---------- ----------                                                                                                   
+         1          2                                                                                                   
+         4          3                                                                                                   
+         4          3                                                                                                   
+
+SQL> alter table a1 enable validate constraint a1_a11_nn;
+
+Table altered.
+
+SQL> desc a1;
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ A11                                                               NOT NULL NUMBER(5)
+ A12                                                                        NUMBER(5)
+
+SQL> insert into a1 values (null,4)l
+  2  ;
+insert into a1 values (null,4)l
+                              *
+ERROR at line 1:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1* insert into a1 values (null,4)
+SQL> /
+insert into a1 values (null,4)
+                       *
+ERROR at line 1:
+ORA-01400: cannot insert NULL into ("OSQLN01"."A1"."A11") 
+
+
+SQL> alter table a1 add (a13 number(5) constraint a1_a13_pk primary key);
+alter table a1 add (a13 number(5) constraint a1_a13_pk primary key)
+            *
+ERROR at line 1:
+ORA-01758: table must be empty to add mandatory (NOT NULL) column 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1* alter table a1 add (a13 number(5) constraint a1_a13_pk check (a13>0))
+SQL> /
+
+Table altered.
+
+SQL> select * from a1;
+
+       A11        A12        A13                                                                                        
+---------- ---------- ----------                                                                                        
+         1          2                                                                                                   
+         4          3                                                                                                   
+         4          3                                                                                                   
+
+SQL> update a1 set a13 = 5;
+
+3 rows updated.
+
+SQL> select * from a1;
+
+       A11        A12        A13                                                                                        
+---------- ---------- ----------                                                                                        
+         1          2          5                                                                                        
+         4          3          5                                                                                        
+         4          3          5                                                                                        
+
+SQL> update a1 set a13 = 7 where a12 = 3;
+
+2 rows updated.
+
+SQL> select * from a1;
+
+       A11        A12        A13                                                                                        
+---------- ---------- ----------                                                                                        
+         1          2          5                                                                                        
+         4          3          7                                                                                        
+         4          3          7                                                                                        
+
+SQL> update a1 set a13 = 7, set a12 = 3 where a12 = 3;
+update a1 set a13 = 7, set a12 = 3 where a12 = 3
+                       *
+ERROR at line 1:
+ORA-01747: invalid user.table.column, table.column, or column specification 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1* update a1 set a13 = 7, a12 = 3 where a12 = 3
+SQL> /
+
+2 rows updated.
+
+SQL> select * from a1;
+
+       A11        A12        A13                                                                                        
+---------- ---------- ----------                                                                                        
+         1          2          5                                                                                        
+         4          3          7                                                                                        
+         4          3          7                                                                                        
+
+SQL> desc a1;
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ A11                                                               NOT NULL NUMBER(5)
+ A12                                                                        NUMBER(5)
+ A13                                                                        NUMBER(5)
+
+SQL> alter table a1 modify (a12 number(2));
+alter table a1 modify (a12 number(2))
+                       *
+ERROR at line 1:
+ORA-01440: column to be modified must be empty to decrease precision or scale 
+
+
+SQL> alter table a1 modify (a12 number(7));
+
+Table altered.
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+A                              TABLE                                                                                    
+A1                             TABLE                                                                                    
+AA                             TABLE                                                                                    
+BB                             TABLE                                                                                    
+CC                             TABLE                                                                                    
+CCC                            TABLE                                                                                    
+COUNTRIES                      TABLE                                                                                    
+DD                             TABLE                                                                                    
+DDD                            TABLE                                                                                    
+DEPARTMENTS                    TABLE                                                                                    
+EE                             TABLE                                                                                    
+EEE                            TABLE                                                                                    
+EMPLOYEES                      TABLE                                                                                    
+EMP_DETAILS_VIEW               VIEW                                                                                     
+FF                             TABLE                                                                                    
+FFF                            TABLE                                                                                    
+GG1                            TABLE                                                                                    
+JOBS                           TABLE                                                                                    
+JOB_GRADES                     TABLE                                                                                    
+JOB_HISTORY                    TABLE                                                                                    
+LOCATIONS                      TABLE                                                                                    
+REGIONS                        TABLE                                                                                    
+
+22 rows selected.
+
+SQL> select * from a;
+
+no rows selected
+
+SQL> desc a;
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ A1                                                                         NUMBER(5)
+ A2                                                                         VARCHAR2(10)
+
+SQL> delete from a;
+
+0 rows deleted.
+
+SQL> alter table a modify (a1 char(15));
+
+Table altered.
+
+SQL> desc a;
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ A1                                                                         CHAR(15)
+ A2                                                                         VARCHAR2(10)
+
+SQL> alter table a modify (a1 number(5));
+
+Table altered.
+
+SQL> alter table add (a3 char(5));
+alter table add (a3 char(5))
+            *
+ERROR at line 1:
+ORA-00903: invalid table name 
+
+
+SQL> alter table a add (a3 char(5));
+
+Table altered.
+
+SQL> desc a;
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ A1                                                                         NUMBER(5)
+ A2                                                                         VARCHAR2(10)
+ A3                                                                         CHAR(5)
+
+SQL> insert into a values (1,'ABC',AA),(2,'DEF',BB);
+insert into a values (1,'ABC',AA),(2,'DEF',BB)
+                                 *
+ERROR at line 1:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> insert into a values (1,'ABC',AA);
+insert into a values (1,'ABC',AA)
+                              *
+ERROR at line 1:
+ORA-00984: column not allowed here 
+
+
+SQL> insert into a values (1,'ABC','AA'),(2,'DEF','BB');
+insert into a values (1,'ABC','AA'),(2,'DEF','BB')
+                                   *
+ERROR at line 1:
+ORA-00933: SQL command not properly ended 
+
+
+SQL> insert into a values (1,'ABC','AA');
+
+1 row created.
+
+SQL> insert into a values (2,'DEF','BB');
+
+1 row created.
+
+SQL> select * from a;
+
+        A1 A2         A3                                                                                                
+---------- ---------- -----                                                                                             
+         1 ABC        AA                                                                                                
+         2 DEF        BB                                                                                                
+
+SQL> desc a;
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ A1                                                                         NUMBER(5)
+ A2                                                                         VARCHAR2(10)
+ A3                                                                         CHAR(5)
+
+SQL> alter table a modify (a2 char(5));
+
+Table altered.
+
+SQL> desc a;
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ A1                                                                         NUMBER(5)
+ A2                                                                         CHAR(5)
+ A3                                                                         CHAR(5)
+
+SQL> select * from a;
+
+        A1 A2    A3                                                                                                     
+---------- ----- -----                                                                                                  
+         1 ABC   AA                                                                                                     
+         2 DEF   BB                                                                                                     
+
+SQL> alter table a modify (a2 varchar2(10));
+
+Table altered.
+
+SQL> desc a;
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ A1                                                                         NUMBER(5)
+ A2                                                                         VARCHAR2(10)
+ A3                                                                         CHAR(5)
+
+SQL> select * from a;
+
+        A1 A2         A3                                                                                                
+---------- ---------- -----                                                                                             
+         1 ABC        AA                                                                                                
+         2 DEF        BB                                                                                                
+
+SQL> alter table a modify (a2 char(5));
+
+Table altered.
+
+SQL> desc a;
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ A1                                                                         NUMBER(5)
+ A2                                                                         CHAR(5)
+ A3                                                                         CHAR(5)
+
+SQL> alter table a modify (a2 varchar2(4));
+alter table a modify (a2 varchar2(4))
+                      *
+ERROR at line 1:
+ORA-01441: cannot decrease column length because some value is too big 
+
+
+SQL> alter table a drop column a3;
+
+Table altered.
+
+SQL> desc a;
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ A1                                                                         NUMBER(5)
+ A2                                                                         CHAR(5)
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+A                              TABLE                                                                                    
+A1                             TABLE                                                                                    
+AA                             TABLE                                                                                    
+BB                             TABLE                                                                                    
+CC                             TABLE                                                                                    
+CCC                            TABLE                                                                                    
+COUNTRIES                      TABLE                                                                                    
+DD                             TABLE                                                                                    
+DDD                            TABLE                                                                                    
+DEPARTMENTS                    TABLE                                                                                    
+EE                             TABLE                                                                                    
+EEE                            TABLE                                                                                    
+EMPLOYEES                      TABLE                                                                                    
+EMP_DETAILS_VIEW               VIEW                                                                                     
+FF                             TABLE                                                                                    
+FFF                            TABLE                                                                                    
+GG1                            TABLE                                                                                    
+JOBS                           TABLE                                                                                    
+JOB_GRADES                     TABLE                                                                                    
+JOB_HISTORY                    TABLE                                                                                    
+LOCATIONS                      TABLE                                                                                    
+REGIONS                        TABLE                                                                                    
+
+22 rows selected.
+
+SQL> select * from a1;
+
+       A11        A12        A13                                                                                        
+---------- ---------- ----------                                                                                        
+         1          2          5                                                                                        
+         4          3          7                                                                                        
+         4          3          7                                                                                        
+
+SQL> alter table a1 drop (a12, a13);
+
+Table altered.
+
+SQL> select * from a1;
+
+       A11                                                                                                              
+----------                                                                                                              
+         1                                                                                                              
+         4                                                                                                              
+         4                                                                                                              
+
+SQL> alter table a1 modify (a1 default '01');
+alter table a1 modify (a1 default '01')
+                       *
+ERROR at line 1:
+ORA-00904: "A1": invalid identifier 
+
+
+SQL> alter table a1 modify (a11 default '01');
+
+Table altered.
+
+SQL> desc department;
+ERROR:
+ORA-04043: object department does not exist 
+
+
+SQL> desc departments;
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ DEPARTMENT_ID                                                     NOT NULL NUMBER(4)
+ DEPARTMENT_NAME                                                   NOT NULL VARCHAR2(30)
+ MANAGER_ID                                                                 NUMBER(6)
+ LOCATION_ID                                                                NUMBER(4)
+
+SQL> create table a2
+  2  (a21 varchar2(10) primary key,
+  3  a22 varchar2(10) references a2(a21));
+
+Table created.
+
+SQL> desc a2;
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ A21                                                               NOT NULL VARCHAR2(10)
+ A22                                                                        VARCHAR2(10)
+
+SQL> insert into a2 (a21) values ('A');
+
+1 row created.
+
+SQL> insert into a2 (a21) values ('B');
+
+1 row created.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> select * from a2;
+
+A21        A22                                                                                                          
+---------- ----------                                                                                                   
+A                                                                                                                       
+B                                                                                                                       
+
+SQL> -- CHAPTER 10 since create tavle a2 ---------------------------
+SQL> select * from a2;
+
+A21        A22                                                                                                          
+---------- ----------                                                                                                   
+A                                                                                                                       
+B                                                                                                                       
+
+SQL> update a2 set a22 = 'B';
+
+2 rows updated.
+
+SQL> select * from a2;
+
+A21        A22                                                                                                          
+---------- ----------                                                                                                   
+A          B                                                                                                            
+B          B                                                                                                            
+
+SQL> insert into a2 values ('C', 'null');
+insert into a2 values ('C', 'null')
+*
+ERROR at line 1:
+ORA-02291: integrity constraint (OSQLN01.SYS_C0012260) violated - parent key not found 
+
+
+SQL> insert into a2 values ('null','A');
+
+1 row created.
+
+SQL> select * from a2;
+
+A21        A22                                                                                                          
+---------- ----------                                                                                                   
+A          B                                                                                                            
+B          B                                                                                                            
+null       A                                                                                                            
+
+SQL> insert into a2 values ('C','null');
+
+1 row created.
+
+SQL> select * from a2;
+
+A21        A22                                                                                                          
+---------- ----------                                                                                                   
+A          B                                                                                                            
+B          B                                                                                                            
+null       A                                                                                                            
+C          null                                                                                                         
+
+SQL> -- DELETE / TRUNCATE --
+SQL> commit;
+
+Commit complete.
+
+SQL> show user
+USER is "OSQLN01"
+SQL> select * from hr.departments;
+select * from hr.departments
+                 *
+ERROR at line 1:
+ORA-01031: insufficient privileges 
+
+
+SQL> -- ON hr user: > grant select, update on departments to osqln01;
+SQL> select * from hr.departments;
+
+DEPARTMENT_ID DEPARTMENT_NAME                MANAGER_ID LOCATION_ID                                                     
+------------- ------------------------------ ---------- -----------                                                     
+           10 Administration                        200        1700                                                     
+           20 Marketing                             201        1800                                                     
+           30 Purchasing                            114        1700                                                     
+           40 Human Resources                       203        2400                                                     
+           50 Shipping                              121        1500                                                     
+           60 IT                                    103        1400                                                     
+           70 Public Relations                      204        2700                                                     
+           80 Sales                                 145        2500                                                     
+           90 Executive                             100        1700                                                     
+          100 Finance                               108        1700                                                     
+          110 Accounting                            205        1700                                                     
+          120 Treasury                                         1700                                                     
+          130 Corporate Tax                                    1700                                                     
+          140 Control And Credit                               1700                                                     
+          150 Shareholder Services                             1700                                                     
+          160 Benefits                                         1700                                                     
+          170 Manufacturing                                    1700                                                     
+          180 Construction                                     1700                                                     
+          190 Contracting                                      1700                                                     
+          200 Operations                                       1700                                                     
+          210 IT Support                                       1700                                                     
+          220 NOC                                              1700                                                     
+
+DEPARTMENT_ID DEPARTMENT_NAME                MANAGER_ID LOCATION_ID                                                     
+------------- ------------------------------ ---------- -----------                                                     
+          230 IT Helpdesk                                      1700                                                     
+          240 Government Sales                                 1700                                                     
+          250 Retail Sales                                     1700                                                     
+          260 Recruiting                                       1700                                                     
+          270 Payroll                                          1700                                                     
+
+27 rows selected.
+
+SQL> update hr.departments set department_name = 'A' where department_id 270;
+update hr.departments set department_name = 'A' where department_id 270
+                                                                    *
+ERROR at line 1:
+ORA-00920: invalid relational operator 
+
+
+SQL> update hr.departments set department_name = 'A' where department_id = 270;
+
+1 row updated.
+
+SQL> select * from hr.departments where department_id = 270;
+
+DEPARTMENT_ID DEPARTMENT_NAME                MANAGER_ID LOCATION_ID                                                     
+------------- ------------------------------ ---------- -----------                                                     
+          270 A                                                1700                                                     
+
+SQL> -- BUT on hr user department_name still 'Payroll'
+SQL> commit;
+
+Commit complete.
+
+SQL> -- when commit, on hr dep_name changed to A
+SQL> -- changed back to Payroll by hr
+SQL> select * from hr.departments where department_id = 270;
+
+DEPARTMENT_ID DEPARTMENT_NAME                MANAGER_ID LOCATION_ID                                                     
+------------- ------------------------------ ---------- -----------                                                     
+          270 A                                                1700                                                     
+
+SQL> select * from hr.departments where department_id = 270;
+
+DEPARTMENT_ID DEPARTMENT_NAME                MANAGER_ID LOCATION_ID                                                     
+------------- ------------------------------ ---------- -----------                                                     
+          270 Payroll                                          1700                                                     
+
+SQL> -- will changed after commit
+SQL> -- SAVEPOINT -------------
+SQL> select * from dept;
+select * from dept
+              *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> select * from departments;
+
+DEPARTMENT_ID DEPARTMENT_NAME                MANAGER_ID LOCATION_ID                                                     
+------------- ------------------------------ ---------- -----------                                                     
+           10 Administration                        200        1700                                                     
+           20 Marketing                             201        1800                                                     
+           50 Shipping                              124        1500                                                     
+           60 IT                                    103        1400                                                     
+           80 Sales                                 149        2500                                                     
+           90 Executive                             100        1700                                                     
+          110 Accounting                            205        1700                                                     
+          190 Contracting                                      1700                                                     
+
+8 rows selected.
+
+SQL> create synonym dept for departments;
+
+Synonym created.
+
+SQL> select * from dept;
+
+DEPARTMENT_ID DEPARTMENT_NAME                MANAGER_ID LOCATION_ID                                                     
+------------- ------------------------------ ---------- -----------                                                     
+           10 Administration                        200        1700                                                     
+           20 Marketing                             201        1800                                                     
+           50 Shipping                              124        1500                                                     
+           60 IT                                    103        1400                                                     
+           80 Sales                                 149        2500                                                     
+           90 Executive                             100        1700                                                     
+          110 Accounting                            205        1700                                                     
+          190 Contracting                                      1700                                                     
+
+8 rows selected.
+
+SQL> insert into dept values (666,'C',100,1700);
+
+1 row created.
+
+SQL> savepoint I2;
+
+Savepoint created.
+
+SQL> update dept set department_name = 'C' where department_id in (80,90);
+
+2 rows updated.
+
+SQL> select * from dept;
+
+DEPARTMENT_ID DEPARTMENT_NAME                MANAGER_ID LOCATION_ID                                                     
+------------- ------------------------------ ---------- -----------                                                     
+          666 C                                     100        1700                                                     
+           10 Administration                        200        1700                                                     
+           20 Marketing                             201        1800                                                     
+           50 Shipping                              124        1500                                                     
+           60 IT                                    103        1400                                                     
+           80 C                                     149        2500                                                     
+           90 C                                     100        1700                                                     
+          110 Accounting                            205        1700                                                     
+          190 Contracting                                      1700                                                     
+
+9 rows selected.
+
+SQL> savepoint U2;
+
+Savepoint created.
+
+SQL> rollback U2;
+rollback U2
+         *
+ERROR at line 1:
+ORA-02181: invalid option to ROLLBACK WORK 
+
+
+SQL> rollback I2;
+rollback I2
+         *
+ERROR at line 1:
+ORA-02181: invalid option to ROLLBACK WORK 
+
+
+SQL> rollback to I2;
+
+Rollback complete.
+
+SQL> select * from dept;
+
+DEPARTMENT_ID DEPARTMENT_NAME                MANAGER_ID LOCATION_ID                                                     
+------------- ------------------------------ ---------- -----------                                                     
+          666 C                                     100        1700                                                     
+           10 Administration                        200        1700                                                     
+           20 Marketing                             201        1800                                                     
+           50 Shipping                              124        1500                                                     
+           60 IT                                    103        1400                                                     
+           80 Sales                                 149        2500                                                     
+           90 Executive                             100        1700                                                     
+          110 Accounting                            205        1700                                                     
+          190 Contracting                                      1700                                                     
+
+9 rows selected.
+
+SQL> rollback;
+
+Rollback complete.
+
+SQL> select * from dept;
+
+DEPARTMENT_ID DEPARTMENT_NAME                MANAGER_ID LOCATION_ID                                                     
+------------- ------------------------------ ---------- -----------                                                     
+           10 Administration                        200        1700                                                     
+           20 Marketing                             201        1800                                                     
+           50 Shipping                              124        1500                                                     
+           60 IT                                    103        1400                                                     
+           80 Sales                                 149        2500                                                     
+           90 Executive                             100        1700                                                     
+          110 Accounting                            205        1700                                                     
+          190 Contracting                                      1700                                                     
+
+8 rows selected.
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+A                              TABLE                                                                                    
+A1                             TABLE                                                                                    
+A2                             TABLE                                                                                    
+AA                             TABLE                                                                                    
+BB                             TABLE                                                                                    
+CC                             TABLE                                                                                    
+CCC                            TABLE                                                                                    
+COUNTRIES                      TABLE                                                                                    
+DD                             TABLE                                                                                    
+DDD                            TABLE                                                                                    
+DEPARTMENTS                    TABLE                                                                                    
+DEPT                           SYNONYM                                                                                  
+EE                             TABLE                                                                                    
+EEE                            TABLE                                                                                    
+EMPLOYEES                      TABLE                                                                                    
+EMP_DETAILS_VIEW               VIEW                                                                                     
+FF                             TABLE                                                                                    
+FFF                            TABLE                                                                                    
+GG1                            TABLE                                                                                    
+JOBS                           TABLE                                                                                    
+JOB_GRADES                     TABLE                                                                                    
+JOB_HISTORY                    TABLE                                                                                    
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+LOCATIONS                      TABLE                                                                                    
+REGIONS                        TABLE                                                                                    
+
+24 rows selected.
+
+SQL> truncate ccc;
+truncate ccc
+           *
+ERROR at line 1:
+ORA-03290: Invalid truncate command - missing CLUSTER or TABLE keyword 
+
+
+SQL> truncate table ccc;
+
+Table truncated.
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+A                              TABLE                                                                                    
+A1                             TABLE                                                                                    
+A2                             TABLE                                                                                    
+AA                             TABLE                                                                                    
+BB                             TABLE                                                                                    
+CC                             TABLE                                                                                    
+CCC                            TABLE                                                                                    
+COUNTRIES                      TABLE                                                                                    
+DD                             TABLE                                                                                    
+DDD                            TABLE                                                                                    
+DEPARTMENTS                    TABLE                                                                                    
+DEPT                           SYNONYM                                                                                  
+EE                             TABLE                                                                                    
+EEE                            TABLE                                                                                    
+EMPLOYEES                      TABLE                                                                                    
+EMP_DETAILS_VIEW               VIEW                                                                                     
+FF                             TABLE                                                                                    
+FFF                            TABLE                                                                                    
+GG1                            TABLE                                                                                    
+JOBS                           TABLE                                                                                    
+JOB_GRADES                     TABLE                                                                                    
+JOB_HISTORY                    TABLE                                                                                    
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+LOCATIONS                      TABLE                                                                                    
+REGIONS                        TABLE                                                                                    
+
+24 rows selected.
+
+SQL> rollback;
+
+Rollback complete.
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+A                              TABLE                                                                                    
+A1                             TABLE                                                                                    
+A2                             TABLE                                                                                    
+AA                             TABLE                                                                                    
+BB                             TABLE                                                                                    
+CC                             TABLE                                                                                    
+CCC                            TABLE                                                                                    
+COUNTRIES                      TABLE                                                                                    
+DD                             TABLE                                                                                    
+DDD                            TABLE                                                                                    
+DEPARTMENTS                    TABLE                                                                                    
+DEPT                           SYNONYM                                                                                  
+EE                             TABLE                                                                                    
+EEE                            TABLE                                                                                    
+EMPLOYEES                      TABLE                                                                                    
+EMP_DETAILS_VIEW               VIEW                                                                                     
+FF                             TABLE                                                                                    
+FFF                            TABLE                                                                                    
+GG1                            TABLE                                                                                    
+JOBS                           TABLE                                                                                    
+JOB_GRADES                     TABLE                                                                                    
+JOB_HISTORY                    TABLE                                                                                    
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+LOCATIONS                      TABLE                                                                                    
+REGIONS                        TABLE                                                                                    
+
+24 rows selected.
+
+SQL> truncate table a;
+
+Table truncated.
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+A                              TABLE                                                                                    
+A1                             TABLE                                                                                    
+A2                             TABLE                                                                                    
+AA                             TABLE                                                                                    
+BB                             TABLE                                                                                    
+CC                             TABLE                                                                                    
+CCC                            TABLE                                                                                    
+COUNTRIES                      TABLE                                                                                    
+DD                             TABLE                                                                                    
+DDD                            TABLE                                                                                    
+DEPARTMENTS                    TABLE                                                                                    
+DEPT                           SYNONYM                                                                                  
+EE                             TABLE                                                                                    
+EEE                            TABLE                                                                                    
+EMPLOYEES                      TABLE                                                                                    
+EMP_DETAILS_VIEW               VIEW                                                                                     
+FF                             TABLE                                                                                    
+FFF                            TABLE                                                                                    
+GG1                            TABLE                                                                                    
+JOBS                           TABLE                                                                                    
+JOB_GRADES                     TABLE                                                                                    
+JOB_HISTORY                    TABLE                                                                                    
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+LOCATIONS                      TABLE                                                                                    
+REGIONS                        TABLE                                                                                    
+
+24 rows selected.
+
+SQL> drop table a;
+
+Table dropped.
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+A1                             TABLE                                                                                    
+A2                             TABLE                                                                                    
+AA                             TABLE                                                                                    
+BB                             TABLE                                                                                    
+BIN$xfzHUOXOTtGjYNVTagUolQ==$0 TABLE                                                                                    
+CC                             TABLE                                                                                    
+CCC                            TABLE                                                                                    
+COUNTRIES                      TABLE                                                                                    
+DD                             TABLE                                                                                    
+DDD                            TABLE                                                                                    
+DEPARTMENTS                    TABLE                                                                                    
+DEPT                           SYNONYM                                                                                  
+EE                             TABLE                                                                                    
+EEE                            TABLE                                                                                    
+EMPLOYEES                      TABLE                                                                                    
+EMP_DETAILS_VIEW               VIEW                                                                                     
+FF                             TABLE                                                                                    
+FFF                            TABLE                                                                                    
+GG1                            TABLE                                                                                    
+JOBS                           TABLE                                                                                    
+JOB_GRADES                     TABLE                                                                                    
+JOB_HISTORY                    TABLE                                                                                    
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+LOCATIONS                      TABLE                                                                                    
+REGIONS                        TABLE                                                                                    
+
+24 rows selected.
+
+SQL> rollback;
+
+Rollback complete.
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+A1                             TABLE                                                                                    
+A2                             TABLE                                                                                    
+AA                             TABLE                                                                                    
+BB                             TABLE                                                                                    
+BIN$xfzHUOXOTtGjYNVTagUolQ==$0 TABLE                                                                                    
+CC                             TABLE                                                                                    
+CCC                            TABLE                                                                                    
+COUNTRIES                      TABLE                                                                                    
+DD                             TABLE                                                                                    
+DDD                            TABLE                                                                                    
+DEPARTMENTS                    TABLE                                                                                    
+DEPT                           SYNONYM                                                                                  
+EE                             TABLE                                                                                    
+EEE                            TABLE                                                                                    
+EMPLOYEES                      TABLE                                                                                    
+EMP_DETAILS_VIEW               VIEW                                                                                     
+FF                             TABLE                                                                                    
+FFF                            TABLE                                                                                    
+GG1                            TABLE                                                                                    
+JOBS                           TABLE                                                                                    
+JOB_GRADES                     TABLE                                                                                    
+JOB_HISTORY                    TABLE                                                                                    
+
+TNAME                          TABTYPE  CLUSTERID                                                                       
+------------------------------ ------- ----------                                                                       
+LOCATIONS                      TABLE                                                                                    
+REGIONS                        TABLE                                                                                    
+
+24 rows selected.
+
+SQL> spool off

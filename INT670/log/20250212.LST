@@ -1,0 +1,89 @@
+SQL> 
+SQL> 
+SQL> create table bb
+  2  (bb1 number(2),
+  3  bb3 varchar2(10) contraint bb_bb2_pk primary key);
+bb3 varchar2(10) contraint bb_bb2_pk primary key)
+                 *
+ERROR at line 3:
+ORA-00907: missing right parenthesis 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table bb
+  2  (bb1 number(2),
+  3* bb2 varchar2(10) contraint bb_bb2_pk primary key)
+SQL> /
+bb2 varchar2(10) contraint bb_bb2_pk primary key)
+                 *
+ERROR at line 3:
+ORA-00907: missing right parenthesis 
+
+
+SQL> select * from bb;
+select * from bb
+              *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> create table bb
+  2  (bb1 number(2),
+  3  bb2 varchar2(10) contraint bb_bb2_pk primary key);
+bb2 varchar2(10) contraint bb_bb2_pk primary key)
+                 *
+ERROR at line 3:
+ORA-00907: missing right parenthesis 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table bb
+  2  (bb1 number(2),
+  3* bb2 varchar2(10))
+SQL> desc bb
+ERROR:
+ORA-04043: object bb does not exist 
+
+
+SQL> desc bb;
+ERROR:
+ORA-04043: object bb does not exist 
+
+
+SQL> select * from bb;
+select * from bb
+              *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> /
+select * from bb
+              *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> create table bb
+  2  (bb1 number(2),
+  3  bb2 varchar2(10));
+
+Table created.
+
+SQL> desc bb;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ BB1                                                NUMBER(2)
+ BB2                                                VARCHAR2(10)
+
+SQL> alter table bb
+  2  add constraint bb_bb2_pk primary key (bb2);
+
+Table altered.
+
+SQL> alter table bb
+  2  

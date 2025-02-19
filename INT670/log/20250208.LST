@@ -1,0 +1,125 @@
+SQL> select &col1, &col2
+  2  from employees
+  3  order by &col2;
+Enter value for col1: last_name
+Enter value for col2: salary
+old   1: select &col1, &col2
+new   1: select last_name, salary
+Enter value for col2: job_id
+old   3: order by &col2
+new   3: order by job_id
+
+LAST_NAME                     SALARY                                            
+------------------------- ----------                                            
+Gietz                           8300                                            
+Higgins                        12000                                            
+Whalen                          4400                                            
+King                           24000                                            
+Kochhar                        17000                                            
+De Haan                        17000                                            
+Lorentz                         4200                                            
+Ernst                           6000                                            
+Hunold                          9000                                            
+Hartstein                      13000                                            
+Fay                             6000                                            
+
+LAST_NAME                     SALARY                                            
+------------------------- ----------                                            
+Zlotkey                        10500                                            
+Abel                           11000                                            
+Grant                           7000                                            
+Taylor                          8600                                            
+Vargas                          2500                                            
+Davies                          3100                                            
+Rajs                            3500                                            
+Matos                           2600                                            
+Mourgos                         5800                                            
+
+20 rows selected.
+
+SQL> define
+DEFINE _DATE           = "08-FEB-25" (CHAR)
+DEFINE _CONNECT_IDENTIFIER = "orcl" (CHAR)
+DEFINE _USER           = "OSQLN01" (CHAR)
+DEFINE _PRIVILEGE      = "" (CHAR)
+DEFINE _SQLPLUS_RELEASE = "1102000100" (CHAR)
+DEFINE _EDITOR         = "Notepad" (CHAR)
+DEFINE _O_VERSION      = "Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options" (CHAR)
+DEFINE _O_RELEASE      = "1102000100" (CHAR)
+SQL> edit
+Wrote file afiedt.buf
+
+  1  select &col1, &&col2
+  2  from employees
+  3* order by &col2
+SQL> /
+Enter value for col1: last_name
+Enter value for col2: salary
+old   1: select &col1, &&col2
+new   1: select last_name, salary
+old   3: order by &col2
+new   3: order by salary
+
+LAST_NAME                     SALARY                                            
+------------------------- ----------                                            
+Vargas                          2500                                            
+Matos                           2600                                            
+Davies                          3100                                            
+Rajs                            3500                                            
+Lorentz                         4200                                            
+Whalen                          4400                                            
+Mourgos                         5800                                            
+Ernst                           6000                                            
+Fay                             6000                                            
+Grant                           7000                                            
+Gietz                           8300                                            
+
+LAST_NAME                     SALARY                                            
+------------------------- ----------                                            
+Taylor                          8600                                            
+Hunold                          9000                                            
+Zlotkey                        10500                                            
+Abel                           11000                                            
+Higgins                        12000                                            
+Hartstein                      13000                                            
+De Haan                        17000                                            
+Kochhar                        17000                                            
+King                           24000                                            
+
+20 rows selected.
+
+SQL> define
+DEFINE _DATE           = "08-FEB-25" (CHAR)
+DEFINE _CONNECT_IDENTIFIER = "orcl" (CHAR)
+DEFINE _USER           = "OSQLN01" (CHAR)
+DEFINE _PRIVILEGE      = "" (CHAR)
+DEFINE _SQLPLUS_RELEASE = "1102000100" (CHAR)
+DEFINE _EDITOR         = "Notepad" (CHAR)
+DEFINE _O_VERSION      = "Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options" (CHAR)
+DEFINE _O_RELEASE      = "1102000100" (CHAR)
+DEFINE _RC             = "0" (CHAR)
+DEFINE COL2            = "salary" (CHAR)
+SQL> define col2 = job_id
+SQL> define
+DEFINE _DATE           = "08-FEB-25" (CHAR)
+DEFINE _CONNECT_IDENTIFIER = "orcl" (CHAR)
+DEFINE _USER           = "OSQLN01" (CHAR)
+DEFINE _PRIVILEGE      = "" (CHAR)
+DEFINE _SQLPLUS_RELEASE = "1102000100" (CHAR)
+DEFINE _EDITOR         = "Notepad" (CHAR)
+DEFINE _O_VERSION      = "Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options" (CHAR)
+DEFINE _O_RELEASE      = "1102000100" (CHAR)
+DEFINE _RC             = "0" (CHAR)
+DEFINE COL2            = "job_id" (CHAR)
+SQL> linesize
+SP2-0042: unknown command "linesize" - rest of line ignored.
+SQL> get linesize
+SP2-0160: unable to open "linesize.sql"
+SQL> undefine col2
+SQL> /
+Enter value for col1: 
+SP2-0546: User requested Interrupt or EOF detected.
+SQL> 

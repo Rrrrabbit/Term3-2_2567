@@ -1,0 +1,861 @@
+SQL> 
+SQL> 
+SQL> define a = 5
+SQL> define b = 'ABC'
+SQL> SELECT a,b,c from abc where a = &a;
+old   1: SELECT a,b,c from abc where a = &a
+new   1: SELECT a,b,c from abc where a = 5
+SELECT a,b,c from abc where a = 5
+                  *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> select employee_id, first_name, last_name from employess where employee_id = &a;
+old   1: select employee_id, first_name, last_name from employess where employee_id = &a
+new   1: select employee_id, first_name, last_name from employess where employee_id = 5
+select employee_id, first_name, last_name from employess where employee_id = 5
+                                               *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> select employee_id, first_name, last_name from employees where employee_id = &a;
+old   1: select employee_id, first_name, last_name from employees where employee_id = &a
+new   1: select employee_id, first_name, last_name from employees where employee_id = 5
+
+no rows selected
+
+SQL> /
+old   1: select employee_id, first_name, last_name from employees where employee_id = &a
+new   1: select employee_id, first_name, last_name from employees where employee_id = 5
+
+no rows selected
+
+SQL> select &col1, &&col2, &&col3 from employees;
+Enter value for col1: employee_id
+Enter value for col2: last_name
+Enter value for col3: first_name
+old   1: select &col1, &&col2, &&col3 from employees
+new   1: select employee_id, last_name, first_name from employees
+
+EMPLOYEE_ID LAST_NAME                 FIRST_NAME                                
+----------- ------------------------- --------------------                      
+        100 King                      Steven                                    
+        101 Kochhar                   Neena                                     
+        102 De Haan                   Lex                                       
+        103 Hunold                    Alexander                                 
+        104 Ernst                     Bruce                                     
+        107 Lorentz                   Diana                                     
+        124 Mourgos                   Kevin                                     
+        141 Rajs                      Trenna                                    
+        142 Davies                    Curtis                                    
+        143 Matos                     Randall                                   
+        144 Vargas                    Peter                                     
+
+EMPLOYEE_ID LAST_NAME                 FIRST_NAME                                
+----------- ------------------------- --------------------                      
+        149 Zlotkey                   Eleni                                     
+        174 Abel                      Ellen                                     
+        176 Taylor                    Jonathon                                  
+        178 Grant                     Kimberely                                 
+        200 Whalen                    Jennifer                                  
+        201 Hartstein                 Michael                                   
+        202 Fay                       Pat                                       
+        205 Higgins                   Shelley                                   
+        206 Gietz                     William                                   
+
+20 rows selected.
+
+SQL> select &col1, &&col3 from employees where employee = &a and first_name = &&b;
+Enter value for col1: job_id
+old   1: select &col1, &&col3 from employees where employee = &a and first_name = &&b
+new   1: select job_id, first_name from employees where employee = 5 and first_name = ABC
+select job_id, first_name from employees where employee = 5 and first_name = ABC
+                                                                             *
+ERROR at line 1:
+ORA-00904: "ABC": invalid identifier 
+
+
+SQL> define
+DEFINE _DATE           = "08-FEB-25" (CHAR)
+DEFINE _CONNECT_IDENTIFIER = "orcl" (CHAR)
+DEFINE _USER           = "OSQLN01" (CHAR)
+DEFINE _PRIVILEGE      = "" (CHAR)
+DEFINE _SQLPLUS_RELEASE = "1102000100" (CHAR)
+DEFINE _EDITOR         = "Notepad" (CHAR)
+DEFINE _O_VERSION      = "Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options" (CHAR)
+DEFINE _O_RELEASE      = "1102000100" (CHAR)
+DEFINE A               = "5" (CHAR)
+DEFINE B               = "ABC" (CHAR)
+DEFINE COL2            = "last_name" (CHAR)
+DEFINE COL3            = "first_name" (CHAR)
+SQL> undefine a
+SQL> /
+Enter value for col1: job_id
+Enter value for a: A
+old   1: select &col1, &&col3 from employees where employee = &a and first_name = &&b
+new   1: select job_id, first_name from employees where employee = A and first_name = ABC
+select job_id, first_name from employees where employee = A and first_name = ABC
+                                                                             *
+ERROR at line 1:
+ORA-00904: "ABC": invalid identifier 
+
+
+SQL> /
+Enter value for col1: employee_id
+Enter value for a: B
+old   1: select &col1, &&col3 from employees where employee = &a and first_name = &&b
+new   1: select employee_id, first_name from employees where employee = B and first_name = ABC
+select employee_id, first_name from employees where employee = B and first_name = ABC
+                                                                                  *
+ERROR at line 1:
+ORA-00904: "ABC": invalid identifier 
+
+
+SQL> select * from tab
+  2  ;
+
+TNAME                          TABTYPE  CLUSTERID                               
+------------------------------ ------- ----------                               
+COUNTRIES                      TABLE                                            
+DEPARTMENTS                    TABLE                                            
+EMPLOYEES                      TABLE                                            
+EMP_DETAILS_VIEW               VIEW                                             
+JOBS                           TABLE                                            
+JOB_GRADES                     TABLE                                            
+JOB_HISTORY                    TABLE                                            
+LOCATIONS                      TABLE                                            
+REGIONS                        TABLE                                            
+
+9 rows selected.
+
+SQL> show user
+USER is "OSQLN01"
+SQL> desc employees
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ EMPLOYEE_ID                               NOT NULL NUMBER(6)
+ FIRST_NAME                                         VARCHAR2(20)
+ LAST_NAME                                 NOT NULL VARCHAR2(25)
+ EMAIL                                     NOT NULL VARCHAR2(25)
+ PHONE_NUMBER                                       VARCHAR2(20)
+ HIRE_DATE                                 NOT NULL DATE
+ JOB_ID                                    NOT NULL VARCHAR2(10)
+ SALARY                                             NUMBER(8,2)
+ COMMISSION_PCT                                     NUMBER(2,2)
+ MANAGER_ID                                         NUMBER(6)
+ DEPARTMENT_ID                                      NUMBER(4)
+
+SQL> create table a
+  2  (a1 number(5), a2 varchar2(10));
+
+Table created.
+
+SQL> desc a
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ A1                                                 NUMBER(5)
+ A2                                                 VARCHAR2(10)
+
+SQL> create table b
+  2  (b1 number(5), 22 varchar2(10));
+(b1 number(5), 22 varchar2(10))
+               *
+ERROR at line 2:
+ORA-00904: : invalid identifier 
+
+
+SQL> (b1 number(5), b2 varchar2(10));
+(b1 number(5), b2 varchar2(10))
+ *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> get linesize
+SP2-0160: unable to open "linesize.sql"
+SQL> linesize
+SP2-0042: unknown command "linesize" - rest of line ignored.
+SQL> 
+SQL> 
+SQL> 
+SQL> create table aa
+  2  (aa1 date,
+  3  aa2 timestamp);
+
+Table created.
+
+SQL> desc aa
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ AA1                                                DATE
+ AA2                                                TIMESTAMP(6)
+
+SQL> select sysdate from dual;
+
+SYSDATE                                                                         
+---------                                                                       
+08-FEB-25                                                                       
+
+SQL> select tochar(sysdate, 'DD-MON-RRRR HH:MI:SS AM') from dual;
+select tochar(sysdate, 'DD-MON-RRRR HH:MI:SS AM') from dual
+       *
+ERROR at line 1:
+ORA-00904: "TOCHAR": invalid identifier 
+
+
+SQL> select to_char(sysdate, 'DD-MON-RRRR HH:MI:SS AM') from dual;
+
+TO_CHAR(SYSDATE,'DD-MON                                                         
+-----------------------                                                         
+08-FEB-2025 01:41:35 PM                                                         
+
+SQL> insert into aa values (sysdate, sysdate);
+
+1 row created.
+
+SQL> select * from aa;
+
+AA1                                                                             
+---------                                                                       
+AA2                                                                             
+---------------------------------------------------------------------------     
+08-FEB-25                                                                       
+08-FEB-25 01.42.13.000000 PM                                                    
+                                                                                
+
+SQL> desc aa;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ AA1                                                DATE
+ AA2                                                TIMESTAMP(6)
+
+SQL> set linesize 100
+SQL> select * from aa;
+
+AA1       AA2                                                                                       
+--------- ---------------------------------------------------------------------------               
+08-FEB-25 08-FEB-25 01.42.13.000000 PM                                                              
+
+SQL> create table cc
+  2  (cc1 timestamp(3),
+  3  cc2 year to month
+  4  , cc3 day to second);
+cc2 year to month
+         *
+ERROR at line 3:
+ORA-00907: missing right parenthesis 
+
+
+SQL> /
+cc2 year to month
+         *
+ERROR at line 3:
+ORA-00907: missing right parenthesis 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table cc
+  2  (cc1 timestamp(3),
+  3  cc2 year to month,
+  4* cc3 day to second)
+SQL> /
+cc2 year to month,
+         *
+ERROR at line 3:
+ORA-00907: missing right parenthesis 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table cc
+  2  (cc1 timestamp(3),
+  3  cc2 intervel year to month,
+  4* cc3 interval day to second)
+SQL> /
+cc2 intervel year to month,
+             *
+ERROR at line 3:
+ORA-00907: missing right parenthesis 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table cc
+  2  (cc1 timestamp(3),
+  3  cc2 interval year to month,
+  4* cc3 interval day to second)
+SQL> /
+
+Table created.
+
+SQL> desc cc
+ Name                                                  Null?    Type
+ ----------------------------------------------------- -------- ------------------------------------
+ CC1                                                            TIMESTAMP(3)
+ CC2                                                            INTERVAL YEAR(2) TO MONTH
+ CC3                                                            INTERVAL DAY(2) TO SECOND(6)
+
+SQL> insert into cc
+  2  values (sysdate, interval '33' month, interval '2500' second);
+
+1 row created.
+
+SQL> select * from cc;
+
+CC1                                                                                                 
+---------------------------------------------------------------------------                         
+CC2                                                                                                 
+---------------------------------------------------------------------------                         
+CC3                                                                                                 
+---------------------------------------------------------------------------                         
+08-FEB-25 02.07.27.000 PM                                                                           
++02-09                                                                                              
++00 00:41:40.000000                                                                                 
+                                                                                                    
+
+SQL> insert into cc
+  2  values (sysdate, interval '330' month, interval '25 2' day to hour);
+
+1 row created.
+
+SQL> select * from cc;
+
+CC1                                                                                                 
+---------------------------------------------------------------------------                         
+CC2                                                                                                 
+---------------------------------------------------------------------------                         
+CC3                                                                                                 
+---------------------------------------------------------------------------                         
+08-FEB-25 02.07.27.000 PM                                                                           
++02-09                                                                                              
++00 00:41:40.000000                                                                                 
+                                                                                                    
+08-FEB-25 02.10.38.000 PM                                                                           
++27-06                                                                                              
++25 02:00:00.000000                                                                                 
+
+CC1                                                                                                 
+---------------------------------------------------------------------------                         
+CC2                                                                                                 
+---------------------------------------------------------------------------                         
+CC3                                                                                                 
+---------------------------------------------------------------------------                         
+                                                                                                    
+
+SQL> desc cc
+ Name                                                  Null?    Type
+ ----------------------------------------------------- -------- ------------------------------------
+ CC1                                                            TIMESTAMP(3)
+ CC2                                                            INTERVAL YEAR(2) TO MONTH
+ CC3                                                            INTERVAL DAY(2) TO SECOND(6)
+
+SQL> insert into cc
+  2  values (sysdate, interval '330' month, interval '250 2' day to hour);
+values (sysdate, interval '330' month, interval '250 2' day to hour)
+                                                *
+ERROR at line 2:
+ORA-01873: the leading precision of the interval is too small 
+
+
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                                                   
+------------------------------ ------- ----------                                                   
+A                              TABLE                                                                
+AA                             TABLE                                                                
+CC                             TABLE                                                                
+COUNTRIES                      TABLE                                                                
+DEPARTMENTS                    TABLE                                                                
+EMPLOYEES                      TABLE                                                                
+EMP_DETAILS_VIEW               VIEW                                                                 
+JOBS                           TABLE                                                                
+JOB_GRADES                     TABLE                                                                
+JOB_HISTORY                    TABLE                                                                
+LOCATIONS                      TABLE                                                                
+
+TNAME                          TABTYPE  CLUSTERID                                                   
+------------------------------ ------- ----------                                                   
+REGIONS                        TABLE                                                                
+
+12 rows selected.
+
+SQL> pagesize
+SP2-0042: unknown command "pagesize" - rest of line ignored.
+SQL> show pagesize
+pagesize 14
+SQL> show linesize
+linesize 100
+SQL> set pagesize 100
+SQL> select * from tab;
+
+TNAME                          TABTYPE  CLUSTERID                                                   
+------------------------------ ------- ----------                                                   
+A                              TABLE                                                                
+AA                             TABLE                                                                
+CC                             TABLE                                                                
+COUNTRIES                      TABLE                                                                
+DEPARTMENTS                    TABLE                                                                
+EMPLOYEES                      TABLE                                                                
+EMP_DETAILS_VIEW               VIEW                                                                 
+JOBS                           TABLE                                                                
+JOB_GRADES                     TABLE                                                                
+JOB_HISTORY                    TABLE                                                                
+LOCATIONS                      TABLE                                                                
+REGIONS                        TABLE                                                                
+
+12 rows selected.
+
+SQL> set pagesize 50
+SQL> select * from employees;
+
+EMPLOYEE_ID FIRST_NAME           LAST_NAME                 EMAIL                                    
+----------- -------------------- ------------------------- -------------------------                
+PHONE_NUMBER         HIRE_DATE JOB_ID         SALARY COMMISSION_PCT MANAGER_ID DEPARTMENT_ID        
+-------------------- --------- ---------- ---------- -------------- ---------- -------------        
+        200 Jennifer             Whalen                    JWHALEN                                  
+515.123.4444         17-SEP-87 AD_ASST          4400                       101            10        
+                                                                                                    
+        201 Michael              Hartstein                 MHARTSTE                                 
+515.123.5555         17-FEB-96 MK_MAN          13000                       100            20        
+                                                                                                    
+        202 Pat                  Fay                       PFAY                                     
+603.123.6666         17-AUG-97 MK_REP           6000                       201            20        
+                                                                                                    
+        205 Shelley              Higgins                   SHIGGINS                                 
+515.123.8080         07-JUN-94 AC_MGR          12000                       101           110        
+                                                                                                    
+        206 William              Gietz                     WGIETZ                                   
+515.123.8181         07-JUN-94 AC_ACCOUNT       8300                       205           110        
+                                                                                                    
+        100 Steven               King                      SKING                                    
+515.123.4567         17-JUN-87 AD_PRES         24000                                      90        
+                                                                                                    
+        101 Neena                Kochhar                   NKOCHHAR                                 
+515.123.4568         21-SEP-89 AD_VP           17000                       100            90        
+                                                                                                    
+        102 Lex                  De Haan                   LDEHAAN                                  
+515.123.4569         13-JAN-93 AD_VP           17000                       100            90        
+                                                                                                    
+        103 Alexander            Hunold                    AHUNOLD                                  
+590.423.4567         03-JAN-90 IT_PROG          9000                       102            60        
+                                                                                                    
+        104 Bruce                Ernst                     BERNST                                   
+590.423.4568         21-MAY-91 IT_PROG          6000                       103            60        
+                                                                                                    
+        107 Diana                Lorentz                   DLORENTZ                                 
+590.423.5567         07-FEB-99 IT_PROG          4200                       103            60        
+                                                                                                    
+        124 Kevin                Mourgos                   KMOURGOS                                 
+650.123.5234         16-NOV-99 ST_MAN           5800                       100            50        
+                                                                                                    
+        141 Trenna               Rajs                      TRAJS                                    
+650.121.8009         17-OCT-95 ST_CLERK         3500                       124            50        
+                                                                                                    
+        142 Curtis               Davies                    CDAVIES                                  
+650.121.2994         29-JAN-97 ST_CLERK         3100                       124            50        
+                                                                                                    
+        143 Randall              Matos                     RMATOS                                   
+650.121.2874         15-MAR-98 ST_CLERK         2600                       124            50        
+                                                                                                    
+
+EMPLOYEE_ID FIRST_NAME           LAST_NAME                 EMAIL                                    
+----------- -------------------- ------------------------- -------------------------                
+PHONE_NUMBER         HIRE_DATE JOB_ID         SALARY COMMISSION_PCT MANAGER_ID DEPARTMENT_ID        
+-------------------- --------- ---------- ---------- -------------- ---------- -------------        
+        144 Peter                Vargas                    PVARGAS                                  
+650.121.2004         09-JUL-98 ST_CLERK         2500                       124            50        
+                                                                                                    
+        149 Eleni                Zlotkey                   EZLOTKEY                                 
+011.44.1344.429018   29-JAN-00 SA_MAN          10500             .2        100            80        
+                                                                                                    
+        174 Ellen                Abel                      EABEL                                    
+011.44.1644.429267   11-MAY-96 SA_REP          11000             .3        149            80        
+                                                                                                    
+        176 Jonathon             Taylor                    JTAYLOR                                  
+011.44.1644.429265   24-MAR-98 SA_REP           8600             .2        149            80        
+                                                                                                    
+        178 Kimberely            Grant                     KGRANT                                   
+011.44.1644.429263   24-MAY-99 SA_REP           7000            .15        149                      
+                                                                                                    
+
+20 rows selected.
+
+SQL> set linesize 150
+SQL> select * from employees;
+
+EMPLOYEE_ID FIRST_NAME           LAST_NAME                 EMAIL                     PHONE_NUMBER         HIRE_DATE JOB_ID         SALARY             
+----------- -------------------- ------------------------- ------------------------- -------------------- --------- ---------- ----------             
+COMMISSION_PCT MANAGER_ID DEPARTMENT_ID                                                                                                               
+-------------- ---------- -------------                                                                                                               
+        200 Jennifer             Whalen                    JWHALEN                   515.123.4444         17-SEP-87 AD_ASST          4400             
+                      101            10                                                                                                               
+                                                                                                                                                      
+        201 Michael              Hartstein                 MHARTSTE                  515.123.5555         17-FEB-96 MK_MAN          13000             
+                      100            20                                                                                                               
+                                                                                                                                                      
+        202 Pat                  Fay                       PFAY                      603.123.6666         17-AUG-97 MK_REP           6000             
+                      201            20                                                                                                               
+                                                                                                                                                      
+        205 Shelley              Higgins                   SHIGGINS                  515.123.8080         07-JUN-94 AC_MGR          12000             
+                      101           110                                                                                                               
+                                                                                                                                                      
+        206 William              Gietz                     WGIETZ                    515.123.8181         07-JUN-94 AC_ACCOUNT       8300             
+                      205           110                                                                                                               
+                                                                                                                                                      
+        100 Steven               King                      SKING                     515.123.4567         17-JUN-87 AD_PRES         24000             
+                                     90                                                                                                               
+                                                                                                                                                      
+        101 Neena                Kochhar                   NKOCHHAR                  515.123.4568         21-SEP-89 AD_VP           17000             
+                      100            90                                                                                                               
+                                                                                                                                                      
+        102 Lex                  De Haan                   LDEHAAN                   515.123.4569         13-JAN-93 AD_VP           17000             
+                      100            90                                                                                                               
+                                                                                                                                                      
+        103 Alexander            Hunold                    AHUNOLD                   590.423.4567         03-JAN-90 IT_PROG          9000             
+                      102            60                                                                                                               
+                                                                                                                                                      
+        104 Bruce                Ernst                     BERNST                    590.423.4568         21-MAY-91 IT_PROG          6000             
+                      103            60                                                                                                               
+                                                                                                                                                      
+        107 Diana                Lorentz                   DLORENTZ                  590.423.5567         07-FEB-99 IT_PROG          4200             
+                      103            60                                                                                                               
+                                                                                                                                                      
+        124 Kevin                Mourgos                   KMOURGOS                  650.123.5234         16-NOV-99 ST_MAN           5800             
+                      100            50                                                                                                               
+                                                                                                                                                      
+        141 Trenna               Rajs                      TRAJS                     650.121.8009         17-OCT-95 ST_CLERK         3500             
+                      124            50                                                                                                               
+                                                                                                                                                      
+        142 Curtis               Davies                    CDAVIES                   650.121.2994         29-JAN-97 ST_CLERK         3100             
+                      124            50                                                                                                               
+                                                                                                                                                      
+        143 Randall              Matos                     RMATOS                    650.121.2874         15-MAR-98 ST_CLERK         2600             
+                      124            50                                                                                                               
+                                                                                                                                                      
+
+EMPLOYEE_ID FIRST_NAME           LAST_NAME                 EMAIL                     PHONE_NUMBER         HIRE_DATE JOB_ID         SALARY             
+----------- -------------------- ------------------------- ------------------------- -------------------- --------- ---------- ----------             
+COMMISSION_PCT MANAGER_ID DEPARTMENT_ID                                                                                                               
+-------------- ---------- -------------                                                                                                               
+        144 Peter                Vargas                    PVARGAS                   650.121.2004         09-JUL-98 ST_CLERK         2500             
+                      124            50                                                                                                               
+                                                                                                                                                      
+        149 Eleni                Zlotkey                   EZLOTKEY                  011.44.1344.429018   29-JAN-00 SA_MAN          10500             
+            .2        100            80                                                                                                               
+                                                                                                                                                      
+        174 Ellen                Abel                      EABEL                     011.44.1644.429267   11-MAY-96 SA_REP          11000             
+            .3        149            80                                                                                                               
+                                                                                                                                                      
+        176 Jonathon             Taylor                    JTAYLOR                   011.44.1644.429265   24-MAR-98 SA_REP           8600             
+            .2        149            80                                                                                                               
+                                                                                                                                                      
+        178 Kimberely            Grant                     KGRANT                    011.44.1644.429263   24-MAY-99 SA_REP           7000             
+           .15        149                                                                                                                             
+                                                                                                                                                      
+
+20 rows selected.
+
+SQL> set linesize 180
+SQL> select * from employees;
+
+EMPLOYEE_ID FIRST_NAME           LAST_NAME                 EMAIL                     PHONE_NUMBER         HIRE_DATE JOB_ID         SALARY COMMISSION_PCT MANAGER_ID DEPARTMENT_ID   
+----------- -------------------- ------------------------- ------------------------- -------------------- --------- ---------- ---------- -------------- ---------- -------------   
+        200 Jennifer             Whalen                    JWHALEN                   515.123.4444         17-SEP-87 AD_ASST          4400                       101            10   
+        201 Michael              Hartstein                 MHARTSTE                  515.123.5555         17-FEB-96 MK_MAN          13000                       100            20   
+        202 Pat                  Fay                       PFAY                      603.123.6666         17-AUG-97 MK_REP           6000                       201            20   
+        205 Shelley              Higgins                   SHIGGINS                  515.123.8080         07-JUN-94 AC_MGR          12000                       101           110   
+        206 William              Gietz                     WGIETZ                    515.123.8181         07-JUN-94 AC_ACCOUNT       8300                       205           110   
+        100 Steven               King                      SKING                     515.123.4567         17-JUN-87 AD_PRES         24000                                      90   
+        101 Neena                Kochhar                   NKOCHHAR                  515.123.4568         21-SEP-89 AD_VP           17000                       100            90   
+        102 Lex                  De Haan                   LDEHAAN                   515.123.4569         13-JAN-93 AD_VP           17000                       100            90   
+        103 Alexander            Hunold                    AHUNOLD                   590.423.4567         03-JAN-90 IT_PROG          9000                       102            60   
+        104 Bruce                Ernst                     BERNST                    590.423.4568         21-MAY-91 IT_PROG          6000                       103            60   
+        107 Diana                Lorentz                   DLORENTZ                  590.423.5567         07-FEB-99 IT_PROG          4200                       103            60   
+        124 Kevin                Mourgos                   KMOURGOS                  650.123.5234         16-NOV-99 ST_MAN           5800                       100            50   
+        141 Trenna               Rajs                      TRAJS                     650.121.8009         17-OCT-95 ST_CLERK         3500                       124            50   
+        142 Curtis               Davies                    CDAVIES                   650.121.2994         29-JAN-97 ST_CLERK         3100                       124            50   
+        143 Randall              Matos                     RMATOS                    650.121.2874         15-MAR-98 ST_CLERK         2600                       124            50   
+        144 Peter                Vargas                    PVARGAS                   650.121.2004         09-JUL-98 ST_CLERK         2500                       124            50   
+        149 Eleni                Zlotkey                   EZLOTKEY                  011.44.1344.429018   29-JAN-00 SA_MAN          10500             .2        100            80   
+        174 Ellen                Abel                      EABEL                     011.44.1644.429267   11-MAY-96 SA_REP          11000             .3        149            80   
+        176 Jonathon             Taylor                    JTAYLOR                   011.44.1644.429265   24-MAR-98 SA_REP           8600             .2        149            80   
+        178 Kimberely            Grant                     KGRANT                    011.44.1644.429263   24-MAY-99 SA_REP           7000            .15        149                 
+
+20 rows selected.
+
+SQL> 
+SQL> 
+SQL> select * from cc;
+
+CC1                                                                         CC2                                                                                                     
+--------------------------------------------------------------------------- ---------------------------------------------------------------------------                             
+CC3                                                                                                                                                                                 
+---------------------------------------------------------------------------                                                                                                         
+08-FEB-25 02.07.27.000 PM                                                   +02-09                                                                                                  
++00 00:41:40.000000                                                                                                                                                                 
+                                                                                                                                                                                    
+08-FEB-25 02.10.38.000 PM                                                   +27-06                                                                                                  
++25 02:00:00.000000                                                                                                                                                                 
+                                                                                                                                                                                    
+
+SQL> set linesize 200
+SQL> select * from cc;
+
+CC1                                                                         CC2                                                                                                                         
+--------------------------------------------------------------------------- ---------------------------------------------------------------------------                                                 
+CC3                                                                                                                                                                                                     
+---------------------------------------------------------------------------                                                                                                                             
+08-FEB-25 02.07.27.000 PM                                                   +02-09                                                                                                                      
++00 00:41:40.000000                                                                                                                                                                                     
+                                                                                                                                                                                                        
+08-FEB-25 02.10.38.000 PM                                                   +27-06                                                                                                                      
++25 02:00:00.000000                                                                                                                                                                                     
+                                                                                                                                                                                                        
+
+SQL> create table dd
+  2  (dd1 number(5),
+  3  dd2 varchar2(10),
+  4  constraint dd_dd1_nn not null,
+  5  primary key (dd2)
+  6  _;
+constraint dd_dd1_nn not null,
+                     *
+ERROR at line 4:
+ORA-00904: : invalid identifier 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table dd
+  2  (dd1 number(5),
+  3  dd2 varchar2(10),
+  4  constraint dd_dd1_nn not null,
+  5* primary key (dd2))
+SQL> /
+constraint dd_dd1_nn not null,
+                     *
+ERROR at line 4:
+ORA-00904: : invalid identifier 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table dd
+  2  (dd1 number(5),
+  3  dd2 varchar2(10),
+  4  constraint dd_dd1_nn not null (dd1),
+  5* primary key (dd2))
+SQL> /
+constraint dd_dd1_nn not null (dd1),
+                     *
+ERROR at line 4:
+ORA-00904: : invalid identifier 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table dd
+  2  (dd1 number(5) constraint dd_dd1_nn not null,
+  3  dd2 varchar2(10),
+  4* primary key (dd2))
+SQL> /
+
+Table created.
+
+SQL> desc dd
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ DD1                                                                                                               NOT NULL NUMBER(5)
+ DD2                                                                                                               NOT NULL VARCHAR2(10)
+
+SQL> desc user_cons_columns
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ OWNER                                                                                                             NOT NULL VARCHAR2(30)
+ CONSTRAINT_NAME                                                                                                   NOT NULL VARCHAR2(30)
+ TABLE_NAME                                                                                                        NOT NULL VARCHAR2(30)
+ COLUMN_NAME                                                                                                                VARCHAR2(4000)
+ POSITION                                                                                                                   NUMBER
+
+SQL> desc user_constraints
+ Name                                                                                                              Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ OWNER                                                                                                                      VARCHAR2(30)
+ CONSTRAINT_NAME                                                                                                   NOT NULL VARCHAR2(30)
+ CONSTRAINT_TYPE                                                                                                            VARCHAR2(1)
+ TABLE_NAME                                                                                                        NOT NULL VARCHAR2(30)
+ SEARCH_CONDITION                                                                                                           LONG
+ R_OWNER                                                                                                                    VARCHAR2(30)
+ R_CONSTRAINT_NAME                                                                                                          VARCHAR2(30)
+ DELETE_RULE                                                                                                                VARCHAR2(9)
+ STATUS                                                                                                                     VARCHAR2(8)
+ DEFERRABLE                                                                                                                 VARCHAR2(14)
+ DEFERRED                                                                                                                   VARCHAR2(9)
+ VALIDATED                                                                                                                  VARCHAR2(13)
+ GENERATED                                                                                                                  VARCHAR2(14)
+ BAD                                                                                                                        VARCHAR2(3)
+ RELY                                                                                                                       VARCHAR2(4)
+ LAST_CHANGE                                                                                                                DATE
+ INDEX_OWNER                                                                                                                VARCHAR2(30)
+ INDEX_NAME                                                                                                                 VARCHAR2(30)
+ INVALID                                                                                                                    VARCHAR2(7)
+ VIEW_RELATED                                                                                                               VARCHAR2(14)
+
+SQL> select contraint_name, column_name
+  2  from user_cons_columns
+  3  where table_name = 'DD';
+select contraint_name, column_name
+       *
+ERROR at line 1:
+ORA-00904: "CONTRAINT_NAME": invalid identifier 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  select constraint_name, column_name
+  2  from user_cons_columns
+  3* where table_name = 'DD'
+SQL> /
+
+CONSTRAINT_NAME                                                                                                                                                                                         
+------------------------------                                                                                                                                                                          
+COLUMN_NAME                                                                                                                                                                                             
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+DD_DD1_NN                                                                                                                                                                                               
+DD1                                                                                                                                                                                                     
+                                                                                                                                                                                                        
+SYS_C0011924                                                                                                                                                                                            
+DD2                                                                                                                                                                                                     
+                                                                                                                                                                                                        
+
+SQL> set linesize 100
+SQL> /
+
+CONSTRAINT_NAME                                                                                     
+------------------------------                                                                      
+COLUMN_NAME                                                                                         
+----------------------------------------------------------------------------------------------------
+DD_DD1_NN                                                                                           
+DD1                                                                                                 
+                                                                                                    
+SYS_C0011924                                                                                        
+DD2                                                                                                 
+                                                                                                    
+
+SQL> alter table dd drop constraint sys_c0011924
+  2  ;
+
+Table altered.
+
+SQL> select constraint_name, column_name
+  2  from user_cons_columns
+  3  where table_name = 'DD';
+
+CONSTRAINT_NAME                                                                                     
+------------------------------                                                                      
+COLUMN_NAME                                                                                         
+----------------------------------------------------------------------------------------------------
+DD_DD1_NN                                                                                           
+DD1                                                                                                 
+                                                                                                    
+
+SQL> create table ee
+  2  (ee1 number(5) unique,
+  3  ee2 number(5) unique);
+
+Table created.
+
+SQL> desc ee
+ Name                                                  Null?    Type
+ ----------------------------------------------------- -------- ------------------------------------
+ EE1                                                            NUMBER(5)
+ EE2                                                            NUMBER(5)
+
+SQL> insert into ee values (1,2);
+
+1 row created.
+
+SQL> select * from ee;
+
+       EE1        EE2                                                                               
+---------- ----------                                                                               
+         1          2                                                                               
+
+SQL> insert ee values (2,2);
+insert ee values (2,2)
+       *
+ERROR at line 1:
+ORA-00925: missing INTO keyword 
+
+
+SQL> insert into ee values (2,2);
+insert into ee values (2,2)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (OSQLN01.SYS_C0011926) violated 
+
+
+SQL> insert into ee values (2,3);
+
+1 row created.
+
+SQL> create table ff
+  2  (ff1 number(5),
+  3  ff2 number(5),
+  4  unique(ff1, ff2));
+
+Table created.
+
+SQL> insert into ff values (1,2);
+
+1 row created.
+
+SQL> insert into ff values (2,2);
+
+1 row created.
+
+SQL> select * from ff;
+
+       FF1        FF2                                                                               
+---------- ----------                                                                               
+         1          2                                                                               
+         2          2                                                                               
+
+SQL> insert into ff values (1,2);
+insert into ff values (1,2)
+*
+ERROR at line 1:
+ORA-00001: unique constraint (OSQLN01.SYS_C0011927) violated 
+
+
+SQL> select last_name, salary, (salary*1.15)+10000 as dream_salary from employees;
+
+LAST_NAME                     SALARY DREAM_SALARY                                                   
+------------------------- ---------- ------------                                                   
+Whalen                          4400        15060                                                   
+Hartstein                      13000        24950                                                   
+Fay                             6000        16900                                                   
+Higgins                        12000        23800                                                   
+Gietz                           8300        19545                                                   
+King                           24000        37600                                                   
+Kochhar                        17000        29550                                                   
+De Haan                        17000        29550                                                   
+Hunold                          9000        20350                                                   
+Ernst                           6000        16900                                                   
+Lorentz                         4200        14830                                                   
+Mourgos                         5800        16670                                                   
+Rajs                            3500        14025                                                   
+Davies                          3100        13565                                                   
+Matos                           2600        12990                                                   
+Vargas                          2500        12875                                                   

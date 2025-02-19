@@ -1,0 +1,190 @@
+SQL> 
+SQL> select 'My Name is ' || last_name
+  2  from employees;
+
+'MYNAMEIS'||LAST_NAME                                                           
+------------------------------------                                            
+My Name is Abel                                                                 
+My Name is Davies                                                               
+My Name is De Haan                                                              
+My Name is Ernst                                                                
+My Name is Fay                                                                  
+My Name is Gietz                                                                
+My Name is Grant                                                                
+My Name is Hartstein                                                            
+My Name is Higgins                                                              
+My Name is Hunold                                                               
+My Name is King                                                                 
+
+'MYNAMEIS'||LAST_NAME                                                           
+------------------------------------                                            
+My Name is Kochhar                                                              
+My Name is Lorentz                                                              
+My Name is Matos                                                                
+My Name is Mourgos                                                              
+My Name is Rajs                                                                 
+My Name is Taylor                                                               
+My Name is Vargas                                                               
+My Name is Whalen                                                               
+My Name is Zlotkey                                                              
+
+20 rows selected.
+
+SQL> desc job_grades
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ GRADE_LEVEL                                        VARCHAR2(3)
+ LOWEST_SAL                                         NUMBER
+ HIGHEST_SAL                                        NUMBER
+
+SQL> /
+
+'MYNAMEIS'||LAST_NAME                                                           
+------------------------------------                                            
+My Name is Abel                                                                 
+My Name is Davies                                                               
+My Name is De Haan                                                              
+My Name is Ernst                                                                
+My Name is Fay                                                                  
+My Name is Gietz                                                                
+My Name is Grant                                                                
+My Name is Hartstein                                                            
+My Name is Higgins                                                              
+My Name is Hunold                                                               
+My Name is King                                                                 
+
+'MYNAMEIS'||LAST_NAME                                                           
+------------------------------------                                            
+My Name is Kochhar                                                              
+My Name is Lorentz                                                              
+My Name is Matos                                                                
+My Name is Mourgos                                                              
+My Name is Rajs                                                                 
+My Name is Taylor                                                               
+My Name is Vargas                                                               
+My Name is Whalen                                                               
+My Name is Zlotkey                                                              
+
+20 rows selected.
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  select 'My Name is ' || last_name || ' KingMongkut''s'
+  2* from employees
+SQL> /
+
+'MYNAMEIS'||LAST_NAME||'KINGMONGKUT''S'                                         
+--------------------------------------------------                              
+My Name is Abel KingMongkut's                                                   
+My Name is Davies KingMongkut's                                                 
+My Name is De Haan KingMongkut's                                                
+My Name is Ernst KingMongkut's                                                  
+My Name is Fay KingMongkut's                                                    
+My Name is Gietz KingMongkut's                                                  
+My Name is Grant KingMongkut's                                                  
+My Name is Hartstein KingMongkut's                                              
+My Name is Higgins KingMongkut's                                                
+My Name is Hunold KingMongkut's                                                 
+My Name is King KingMongkut's                                                   
+
+'MYNAMEIS'||LAST_NAME||'KINGMONGKUT''S'                                         
+--------------------------------------------------                              
+My Name is Kochhar KingMongkut's                                                
+My Name is Lorentz KingMongkut's                                                
+My Name is Matos KingMongkut's                                                  
+My Name is Mourgos KingMongkut's                                                
+My Name is Rajs KingMongkut's                                                   
+My Name is Taylor KingMongkut's                                                 
+My Name is Vargas KingMongkut's                                                 
+My Name is Whalen KingMongkut's                                                 
+My Name is Zlotkey KingMongkut's                                                
+
+20 rows selected.
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  select 'My Name is ' || last_name || '[KingMongkut''s]'
+  2* from employees
+SQL> /
+
+'MYNAMEIS'||LAST_NAME||'[KINGMONGKUT''S]'                                       
+---------------------------------------------------                             
+My Name is Abel[KingMongkut's]                                                  
+My Name is Davies[KingMongkut's]                                                
+My Name is De Haan[KingMongkut's]                                               
+My Name is Ernst[KingMongkut's]                                                 
+My Name is Fay[KingMongkut's]                                                   
+My Name is Gietz[KingMongkut's]                                                 
+My Name is Grant[KingMongkut's]                                                 
+My Name is Hartstein[KingMongkut's]                                             
+My Name is Higgins[KingMongkut's]                                               
+My Name is Hunold[KingMongkut's]                                                
+My Name is King[KingMongkut's]                                                  
+
+'MYNAMEIS'||LAST_NAME||'[KINGMONGKUT''S]'                                       
+---------------------------------------------------                             
+My Name is Kochhar[KingMongkut's]                                               
+My Name is Lorentz[KingMongkut's]                                               
+My Name is Matos[KingMongkut's]                                                 
+My Name is Mourgos[KingMongkut's]                                               
+My Name is Rajs[KingMongkut's]                                                  
+My Name is Taylor[KingMongkut's]                                                
+My Name is Vargas[KingMongkut's]                                                
+My Name is Whalen[KingMongkut's]                                                
+My Name is Zlotkey[KingMongkut's]                                               
+
+20 rows selected.
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  select 'My Name is ' || last_name || q'[KingMongkut''s]'
+  2* from employees
+SQL> /
+
+'MYNAMEIS'||LAST_NAME||Q'[KINGMONGKUT''S]'                                      
+--------------------------------------------------                              
+My Name is AbelKingMongkut''s                                                   
+My Name is DaviesKingMongkut''s                                                 
+My Name is De HaanKingMongkut''s                                                
+My Name is ErnstKingMongkut''s                                                  
+My Name is FayKingMongkut''s                                                    
+My Name is GietzKingMongkut''s                                                  
+My Name is GrantKingMongkut''s                                                  
+My Name is HartsteinKingMongkut''s                                              
+My Name is HigginsKingMongkut''s                                                
+My Name is HunoldKingMongkut''s                                                 
+My Name is KingKingMongkut''s                                                   
+
+'MYNAMEIS'||LAST_NAME||Q'[KINGMONGKUT''S]'                                      
+--------------------------------------------------                              
+My Name is KochharKingMongkut''s                                                
+My Name is LorentzKingMongkut''s                                                
+My Name is MatosKingMongkut''s                                                  
+My Name is MourgosKingMongkut''s                                                
+My Name is RajsKingMongkut''s                                                   
+My Name is TaylorKingMongkut''s                                                 
+My Name is VargasKingMongkut''s                                                 
+My Name is WhalenKingMongkut''s                                                 
+My Name is ZlotkeyKingMongkut''s                                                
+
+20 rows selected.
+
+SQL> desc employees
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ EMPLOYEE_ID                               NOT NULL NUMBER(6)
+ FIRST_NAME                                         VARCHAR2(20)
+ LAST_NAME                                 NOT NULL VARCHAR2(25)
+ EMAIL                                     NOT NULL VARCHAR2(25)
+ PHONE_NUMBER                                       VARCHAR2(20)
+ HIRE_DATE                                 NOT NULL DATE
+ JOB_ID                                    NOT NULL VARCHAR2(10)
+ SALARY                                             NUMBER(8,2)
+ COMMISSION_PCT                                     NUMBER(2,2)
+ MANAGER_ID                                         NUMBER(6)
+ DEPARTMENT_ID                                      NUMBER(4)
+
+SQL> spool off

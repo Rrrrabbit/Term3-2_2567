@@ -1,0 +1,29 @@
+SQL> --SQL Plus fundamental
+SQL> set linesize 120
+SQL> select * from employees where department_id in
+  2  (select department_id from departments where department_name like '%M%');
+
+EMPLOYEE_ID FIRST_NAME           LAST_NAME                 EMAIL                     PHONE_NUMBER         HIRE_DATE
+----------- -------------------- ------------------------- ------------------------- -------------------- ---------
+JOB_ID         SALARY COMMISSION_PCT MANAGER_ID DEPARTMENT_ID
+---------- ---------- -------------- ---------- -------------
+        201 Michael              Hartstein                 MHARTSTE                  515.123.5555         17-FEB-96
+MK_MAN          13000                       100            20
+
+        202 Pat                  Fay                       PFAY                      603.123.6666         17-AUG-97
+MK_REP           6000                       201            20
+
+
+2 rows selected.
+
+SQL> set linesize 200
+SQL> select * from employees where department_id in (select department_id from departments where department_name like '%M%');
+
+EMPLOYEE_ID FIRST_NAME           LAST_NAME                 EMAIL                     PHONE_NUMBER         HIRE_DATE JOB_ID         SALARY COMMISSION_PCT MANAGER_ID DEPARTMENT_ID
+----------- -------------------- ------------------------- ------------------------- -------------------- --------- ---------- ---------- -------------- ---------- -------------
+        201 Michael              Hartstein                 MHARTSTE                  515.123.5555         17-FEB-96 MK_MAN          13000                       100            20
+        202 Pat                  Fay                       PFAY                      603.123.6666         17-AUG-97 MK_REP           6000                       201            20
+
+2 rows selected.
+
+SQL> spool off
