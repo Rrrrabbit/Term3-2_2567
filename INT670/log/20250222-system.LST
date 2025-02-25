@@ -1,0 +1,46 @@
+SQL> show user
+USER is "SYSTEM"
+SQL> grant create table to hr with admin option;
+
+Grant succeeded.
+
+SQL> create role a_role;
+
+Role created.
+
+SQL> grant create view, create sequence to a_role;
+
+Grant succeeded.
+
+SQL> create role b_role;
+
+Role created.
+
+SQL> grant create view, create sequence to b_role;
+
+Grant succeeded.
+
+SQL> grant b_role to osqln01, hr;
+
+Grant succeeded.
+
+SQL> grant select on osqln01.employees to b_role;
+
+Grant succeeded.
+
+SQL> grant update on employees to a_role;
+grant update on employees to a_role
+                *
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+
+
+SQL> grant a_role to osqln01;
+
+Grant succeeded.
+
+SQL> grant a_role to osqln01 with admin option;
+
+Grant succeeded.
+
+SQL> spool off

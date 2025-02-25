@@ -1,0 +1,28 @@
+SQL> 
+SQL> show user
+USER is "SCOTT"
+SQL> select * from user_tab_privs_recd
+  2  ;
+
+OWNER                          TABLE_NAME                                       
+------------------------------ ------------------------------                   
+GRANTOR                        PRIVILEGE                                GRA HIE 
+------------------------------ ---------------------------------------- --- --- 
+OSQLN01                        EMPLOYEES                                        
+OSQLN01                        SELECT                                   YES NO  
+                                                                                
+
+SQL> -- received SELECT from osqln01 and GRA (with grant option) = YES
+SQL> grant select on osqln01.employees to hr with grant option;
+
+Grant succeeded.
+
+SQL> -- osqln01: revoke select on employees from scott;
+SQL> select * from user_tab_privs_recd;
+
+no rows selected
+
+SQL> -- WITN ADMIN OPTION
+SQL> show user
+USER is "SCOTT"
+SQL> spool off

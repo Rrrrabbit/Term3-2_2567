@@ -1,0 +1,959 @@
+SQL> -- CHAPTER 7 - Administering User Security
+SQL> desc user_role_privs
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ USERNAME                                                                   VARCHAR2(30)
+ GRANTED_ROLE                                                               VARCHAR2(30)
+ ADMIN_OPTION                                                               VARCHAR2(3)
+ DEFAULT_ROLE                                                               VARCHAR2(3)
+ OS_GRANTED                                                                 VARCHAR2(3)
+
+SQL> -- privilege that grant for current user's role (osqln01)
+SQL> select * from user_role_privs
+  2  ;
+
+USERNAME                       GRANTED_ROLE                   ADM DEF OS_                                               
+------------------------------ ------------------------------ --- --- ---                                               
+OSQLN01                        CONNECT                        NO  YES NO                                                
+OSQLN01                        STUDENT                        NO  YES NO                                                
+
+SQL> -- ADM = with admin option
+SQL> -- NO = can't grant other user
+SQL> -- > grant connect to osqln01; "Connect": predefined role
+SQL> desc role_sys_privs
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ ROLE                                                              NOT NULL VARCHAR2(30)
+ PRIVILEGE                                                         NOT NULL VARCHAR2(40)
+ ADMIN_OPTION                                                               VARCHAR2(3)
+
+SQL> select * from role_sys_privs
+  2  ;
+
+ROLE                           PRIVILEGE                                ADM                                             
+------------------------------ ---------------------------------------- ---                                             
+STUDENT                        CREATE PUBLIC SYNONYM                    NO                                              
+STUDENT                        CREATE TYPE                              NO                                              
+STUDENT                        ALTER SESSION                            NO                                              
+STUDENT                        QUERY REWRITE                            NO                                              
+CONNECT                        CREATE SESSION                           NO                                              
+STUDENT                        CREATE PROCEDURE                         NO                                              
+STUDENT                        CREATE ANY INDEX                         NO                                              
+STUDENT                        CREATE SESSION                           NO                                              
+STUDENT                        CREATE TRIGGER                           NO                                              
+
+9 rows selected.
+
+SQL> -- check that the role has what sys privileges
+SQL> -- remark that this user has "CREATE SESSION" from different role (student, connect)
+SQL> grant select (employee_id, lastname)
+  2  on employees
+  3  to hr;
+grant select (employee_id, lastname)
+             *
+ERROR at line 1:
+ORA-00969: missing ON keyword 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  grant update (employee_id, lastname)
+  2  on employees
+  3* to hr
+SQL> /
+grant update (employee_id, lastname)
+                           *
+ERROR at line 1:
+ORA-00904: "LASTNAME": invalid identifier 
+
+
+SQL> \
+SP2-0042: unknown command "\" - rest of line ignored.
+SQL> edit
+Wrote file afiedt.buf
+
+  1  grant update (employee_id, last_name)
+  2  on employees
+  3* to hr
+SQL> \
+SP2-0042: unknown command "\" - rest of line ignored.
+SQL> /
+
+Grant succeeded.
+
+SQL> create view emp_vu
+  2  as select employee_id, last_name from employees;
+
+View created.
+
+SQL> grant select on emp_vu to hr;
+
+Grant succeeded.
+
+SQL> -- grant select couldn't grant to some column
+SQL> -- need to create view first, then grant the whole view
+SQL> -- * couldn;t grant to only some column
+SQL> show user
+USER is "OSQLN01"
+SQL> grant select on employees to scott with grant option;
+
+Grant succeeded.
+
+SQL> select * from user_tab_privs_made;
+
+GRANTEE                        TABLE_NAME                     GRANTOR                                                   
+------------------------------ ------------------------------ ------------------------------                            
+PRIVILEGE                                GRA HIE                                                                        
+---------------------------------------- --- ---                                                                        
+HR                             A1                             OSQLN01                                                   
+SELECT                                   NO  NO                                                                         
+                                                                                                                        
+HR                             EMP_VU                         OSQLN01                                                   
+SELECT                                   NO  NO                                                                         
+                                                                                                                        
+SCOTT                          EMPLOYEES                      OSQLN01                                                   
+SELECT                                   YES NO                                                                         
+                                                                                                                        
+HR                             EMPLOYEES                      SCOTT                                                     
+SELECT                                   YES NO                                                                         
+                                                                                                                        
+
+SQL> -- owner obj can see that HR received grant option from SCOTT
+SQL> revoke select on employees from hr;
+revoke select on employees from hr
+*
+ERROR at line 1:
+ORA-01927: cannot REVOKE privileges you did not grant 
+
+
+SQL> -- see that system not allowed owner to revoke privs from some user that they didn't grant
+SQL> revoke select on employees from scott;
+
+Revoke succeeded.
+
+SQL> select * from user_tab_privs_made;
+
+GRANTEE                        TABLE_NAME                     GRANTOR                                                   
+------------------------------ ------------------------------ ------------------------------                            
+PRIVILEGE                                GRA HIE                                                                        
+---------------------------------------- --- ---                                                                        
+HR                             A1                             OSQLN01                                                   
+SELECT                                   NO  NO                                                                         
+                                                                                                                        
+HR                             EMP_VU                         OSQLN01                                                   
+SELECT                                   NO  NO                                                                         
+                                                                                                                        
+
+SQL> -- no privs on employees now
+SQL> -- -----------
+SQL> -- WITH ADMIN OPTION
+SQL> show user
+USER is "OSQLN01"
+SQL> grant create table to scott;
+grant create table to scott
+*
+ERROR at line 1:
+ORA-01031: insufficient privileges 
+
+
+SQL> -- received b_role
+SQL> -- grant select on osqln01.employees to b_role;
+SQL> grant update on employees to a_role
+  2  ;
+
+Grant succeeded.
+
+SQL> grant a_role to b_role;
+grant a_role to b_role
+*
+ERROR at line 1:
+ORA-01919: role 'A_ROLE' does not exist 
+
+
+SQL> -- system> grant a_role to osqln01;
+SQL> grant a_role to b_role;
+grant a_role to b_role
+*
+ERROR at line 1:
+ORA-01932: ADMIN option not granted for role 'A_ROLE' 
+
+
+SQL> -- system> grant a_role to osqln01 with admin option;
+SQL> grant a_role to b_role;
+
+Grant succeeded.
+
+SQL> select * from user_tab_privs_recd;
+
+OWNER                          TABLE_NAME                     GRANTOR                                                   
+------------------------------ ------------------------------ ------------------------------                            
+PRIVILEGE                                GRA HIE                                                                        
+---------------------------------------- --- ---                                                                        
+HR                             DEPARTMENTS                    HR                                                        
+UPDATE                                   NO  NO                                                                         
+                                                                                                                        
+HR                             DEPARTMENTS                    HR                                                        
+SELECT                                   NO  NO                                                                         
+                                                                                                                        
+
+SQL> show user
+USER is "OSQLN01"
+SQL> -- ALTER USER
+SQL> alter user osqln01 identified by a;
+
+User altered.
+
+SQL> -- change password
+SQL> -- to "a"
+SQL> 
+SQL> -- quiz
+SQL> create table Customers (
+  2  IDint constraint cust_id_pk primary key,
+  3  CustomerIDint,
+  4  FirstNamevarchar(50),
+  5  LastNamevarchar(50));
+FirstNamevarchar(50),
+                *
+ERROR at line 4:
+ORA-00902: invalid datatype 
+
+
+SQL> create table Customers (
+  2  IDint constraint cust_id_pk primary key,
+  3  CustomerIDint,
+  4  FirstNamevarchar(50),
+  5  FirstNamevarchar(50),
+  6  ;
+FirstNamevarchar(50),
+                *
+ERROR at line 4:
+ORA-00902: invalid datatype 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table Customers (
+  2  IDint constraint cust_id_pk primary key,
+  3  CustomerID int,
+  4  FirstName varchar(50),
+  5* LastName varchar(50))
+SQL> /
+IDint constraint cust_id_pk primary key,
+*
+ERROR at line 2:
+ORA-02263: need to specify the datatype for this column 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table Customers (
+  2  ID int constraint cust_id_pk primary key,
+  3  CustomerID int,
+  4  FirstName varchar(50),
+  5* LastName varchar(50))
+SQL> /
+
+Table created.
+
+SQL> create table Products (
+  2  IDint constraint prod_id_pk primary key,
+  3  ProductIDint,
+  4  Nameint,
+  5  Pricenumeric(8,2));
+Pricenumeric(8,2))
+            *
+ERROR at line 5:
+ORA-00902: invalid datatype 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table Products (
+  2  ID int constraint prod_id_pk primary key,
+  3  ProductID int,
+  4  Name varchar(50),
+  5* Price numeric(8,2))
+SQL> /
+
+Table created.
+
+SQL> create table Reviews (
+  2  IDint constraint revw_id_pk primary key,
+  3  ProductIDint,
+  4  ReviewerIDint,
+  5  Ratingint,
+  6  Reviewtext,
+  7  Products_IDint constraint revw_prodid_fk references Products(ID));
+IDint constraint revw_id_pk primary key,
+*
+ERROR at line 2:
+ORA-02263: need to specify the datatype for this column 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table Reviews (
+  2  ID int constraint revw_id_pk primary key,
+  3  ProductID int,
+  4  ReviewerID int,
+  5  Rating int,
+  6  Review text,
+  7* Products_ID int constraint revw_prodid_fk references Products(ID))
+SQL> /
+Review text,
+       *
+ERROR at line 6:
+ORA-00902: invalid datatype 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table Reviews (
+  2  ID int constraint revw_id_pk primary key,
+  3  ProductID int,
+  4  ReviewerID int,
+  5  Rating int,
+  6  Review varchar(255),
+  7* Products_ID int constraint revw_prodid_fk references Products(ID))
+SQL> /
+
+Table created.
+
+SQL> create table Orders (
+  2  IDint constraint ord_id_pk primary key,
+  3  OrderIDint,
+  4  Quantityint,
+  5  ProductIDint,
+  6  CreatedAtdatetime2,
+  7  Products_IDint constraint ord_prodid_fk references Products(ID),
+  8  Customers_IDint constraint ord_cusid_fk references Customers(ID));
+IDint constraint ord_id_pk primary key,
+*
+ERROR at line 2:
+ORA-02263: need to specify the datatype for this column 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table Orders (
+  2  ID int constraint ord_id_pk primary key,
+  3  OrderID int,
+  4  Quantity int,
+  5  ProductID int,
+  6  CreatedAt datetime2,
+  7  Products_ID int constraint ord_prodid_fk references Products(ID),
+  8* Customers_ID int constraint ord_cusid_fk references Customers(ID))
+SQL> /
+CreatedAt datetime2,
+          *
+ERROR at line 6:
+ORA-00902: invalid datatype 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table Orders (
+  2  ID int constraint ord_id_pk primary key,
+  3  OrderID int,
+  4  Quantity int,
+  5  ProductID int,
+  6  CreatedAt datetime,
+  7  Products_ID int constraint ord_prodid_fk references Products(ID),
+  8* Customers_ID int constraint ord_cusid_fk references Customers(ID))
+SQL> /
+CreatedAt datetime,
+          *
+ERROR at line 6:
+ORA-00902: invalid datatype 
+
+
+SQL> edit
+Wrote file afiedt.buf
+
+  1  create table Orders (
+  2  ID int constraint ord_id_pk primary key,
+  3  OrderID int,
+  4  Quantity int,
+  5  ProductID int,
+  6  CreatedAt timestamp,
+  7  Products_ID int constraint ord_prodid_fk references Products(ID),
+  8* Customers_ID int constraint ord_cusid_fk references Customers(ID))
+SQL> /
+
+Table created.
+
+SQL> desc reviewsl
+ERROR:
+ORA-04043: object reviewsl does not exist 
+
+
+SQL> desc reviews
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ ID                                                                NOT NULL NUMBER(38)
+ PRODUCTID                                                                  NUMBER(38)
+ REVIEWERID                                                                 NUMBER(38)
+ RATING                                                                     NUMBER(38)
+ REVIEW                                                                     VARCHAR2(255)
+ PRODUCTS_ID                                                                NUMBER(38)
+
+SQL> alter table reviews rename column productid to product_id;
+
+Table altered.
+
+SQL> desc reviews
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ ID                                                                NOT NULL NUMBER(38)
+ PRODUCT_ID                                                                 NUMBER(38)
+ REVIEWERID                                                                 NUMBER(38)
+ RATING                                                                     NUMBER(38)
+ REVIEW                                                                     VARCHAR2(255)
+ PRODUCTS_ID                                                                NUMBER(38)
+
+SQL> desc products
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ ID                                                                NOT NULL NUMBER(38)
+ PRODUCTID                                                                  NUMBER(38)
+ NAME                                                                       VARCHAR2(50)
+ PRICE                                                                      NUMBER(8,2)
+
+SQL> desc customers
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ ID                                                                NOT NULL NUMBER(38)
+ CUSTOMERID                                                                 NUMBER(38)
+ FIRSTNAME                                                                  VARCHAR2(50)
+ LASTNAME                                                                   VARCHAR2(50)
+
+SQL> desc orders
+ Name                                                              Null?    Type
+ ----------------------------------------------------------------- -------- --------------------------------------------
+ ID                                                                NOT NULL NUMBER(38)
+ ORDERID                                                                    NUMBER(38)
+ QUANTITY                                                                   NUMBER(38)
+ PRODUCTID                                                                  NUMBER(38)
+ CREATEDAT                                                                  TIMESTAMP(6)
+ PRODUCTS_ID                                                                NUMBER(38)
+ CUSTOMERS_ID                                                               NUMBER(38)
+
+SQL> insert into customers value(1, 1, 'Alice', 'AAA');
+insert into customers value(1, 1, 'Alice', 'AAA')
+                            *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> insert into customers value(2, 2, 'Bob', 'BBB');
+insert into customers value(2, 2, 'Bob', 'BBB')
+                            *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> insert into customers value(3, 3, 'Charlie', 'CCC');
+insert into customers value(3, 3, 'Charlie', 'CCC')
+                            *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> 
+SQL> insert into products value(1, 1, 'Pencil', 10.00);
+insert into products value(1, 1, 'Pencil', 10.00)
+                           *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> insert into products value(2, 2, 'Pen', 20.00);
+insert into products value(2, 2, 'Pen', 20.00)
+                           *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> insert into products value(3, 3, 'Ruler', 5.50);
+insert into products value(3, 3, 'Ruler', 5.50)
+                           *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> 
+SQL> insert into orders value(1, 1, 10, 100, sysdate, 1, 1);
+insert into orders value(1, 1, 10, 100, sysdate, 1, 1)
+                         *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> insert into orders value(2, 1, 15, 200, sysdate, 2, 1);
+insert into orders value(2, 1, 15, 200, sysdate, 2, 1)
+                         *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> insert into orders value(3, 2, 10, 300, sysdate, 3, 3);
+insert into orders value(3, 2, 10, 300, sysdate, 3, 3)
+                         *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> 
+SQL> insert into reviews value(1, 100, 1, 1, 'Too expensive low quality', 1);
+insert into reviews value(1, 100, 1, 1, 'Too expensive low quality', 1)
+                          *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> insert into reviews value(2, 200, 2, 2, 'No ink', 2);
+insert into reviews value(2, 200, 2, 2, 'No ink', 2)
+                          *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> insert into reviews value(3, 300, 3, 4, 'Good quality', 3);
+insert into reviews value(3, 300, 3, 4, 'Good quality', 3)
+                          *
+ERROR at line 1:
+ORA-00928: missing SELECT keyword 
+
+
+SQL> insert into customers values(1, 1, 'Alice', 'AAA');
+
+1 row created.
+
+SQL> insert into customers values(2, 2, 'Bob', 'BBB');
+
+1 row created.
+
+SQL> insert into customers values(3, 3, 'Charlie', 'CCC');
+
+1 row created.
+
+SQL> 
+SQL> insert into products values(1, 1, 'Pencil', 10.00);
+
+1 row created.
+
+SQL> insert into products values(2, 2, 'Pen', 20.00);
+
+1 row created.
+
+SQL> insert into products values(3, 3, 'Ruler', 5.50);
+
+1 row created.
+
+SQL> 
+SQL> insert into orders values(1, 1, 10, 100, sysdate, 1, 1);
+
+1 row created.
+
+SQL> insert into orders values(2, 1, 15, 200, sysdate, 2, 1);
+
+1 row created.
+
+SQL> insert into orders values(3, 2, 10, 300, sysdate, 3, 3);
+
+1 row created.
+
+SQL> 
+SQL> insert into reviews values(1, 100, 1, 1, 'Too expensive low quality', 1);
+
+1 row created.
+
+SQL> insert into reviews values(2, 200, 2, 2, 'No ink', 2);
+
+1 row created.
+
+SQL> insert into reviews values(3, 300, 3, 4, 'Good quality', 3);
+
+1 row created.
+
+SQL> select * from reviews;
+
+        ID PRODUCT_ID REVIEWERID     RATING                                                                             
+---------- ---------- ---------- ----------                                                                             
+REVIEW                                                                                                                  
+------------------------------------------------------------------------------------------------------------------------
+PRODUCTS_ID                                                                                                             
+-----------                                                                                                             
+         1        100          1          1                                                                             
+Too expensive low quality                                                                                               
+          1                                                                                                             
+                                                                                                                        
+         2        200          2          2                                                                             
+No ink                                                                                                                  
+          2                                                                                                             
+                                                                                                                        
+         3        300          3          4                                                                             
+Good quality                                                                                                            
+          3                                                                                                             
+                                                                                                                        
+
+SQL> select * from products;
+
+        ID  PRODUCTID NAME                                                    PRICE                                     
+---------- ---------- -------------------------------------------------- ----------                                     
+         1          1 Pencil                                                     10                                     
+         2          2 Pen                                                        20                                     
+         3          3 Ruler                                                     5.5                                     
+
+SQL> select * from customers;
+
+        ID CUSTOMERID FIRSTNAME                                                                                         
+---------- ---------- --------------------------------------------------                                                
+LASTNAME                                                                                                                
+--------------------------------------------------                                                                      
+         1          1 Alice                                                                                             
+AAA                                                                                                                     
+                                                                                                                        
+         2          2 Bob                                                                                               
+BBB                                                                                                                     
+                                                                                                                        
+         3          3 Charlie                                                                                           
+CCC                                                                                                                     
+                                                                                                                        
+
+SQL> select * from orders;
+
+        ID    ORDERID   QUANTITY  PRODUCTID CREATEDAT                                                                   
+---------- ---------- ---------- ---------- --------------------------------------------------------------------------- 
+PRODUCTS_ID CUSTOMERS_ID                                                                                                
+----------- ------------                                                                                                
+         1          1         10        100 22-FEB-25 03.16.06.000000 PM                                                
+          1            1                                                                                                
+                                                                                                                        
+         2          1         15        200 22-FEB-25 03.16.06.000000 PM                                                
+          2            1                                                                                                
+                                                                                                                        
+         3          2         10        300 22-FEB-25 03.16.06.000000 PM                                                
+          3            3                                                                                                
+                                                                                                                        
+
+SQL> select * from reviews where rating <=4;
+
+        ID PRODUCT_ID REVIEWERID     RATING                                                                             
+---------- ---------- ---------- ----------                                                                             
+REVIEW                                                                                                                  
+------------------------------------------------------------------------------------------------------------------------
+PRODUCTS_ID                                                                                                             
+-----------                                                                                                             
+         1        100          1          1                                                                             
+Too expensive low quality                                                                                               
+          1                                                                                                             
+                                                                                                                        
+         2        200          2          2                                                                             
+No ink                                                                                                                  
+          2                                                                                                             
+                                                                                                                        
+         3        300          3          4                                                                             
+Good quality                                                                                                            
+          3                                                                                                             
+                                                                                                                        
+
+SQL> select * from orders where createdat < sysdate;
+
+        ID    ORDERID   QUANTITY  PRODUCTID CREATEDAT                                                                   
+---------- ---------- ---------- ---------- --------------------------------------------------------------------------- 
+PRODUCTS_ID CUSTOMERS_ID                                                                                                
+----------- ------------                                                                                                
+         1          1         10        100 22-FEB-25 03.16.06.000000 PM                                                
+          1            1                                                                                                
+                                                                                                                        
+         2          1         15        200 22-FEB-25 03.16.06.000000 PM                                                
+          2            1                                                                                                
+                                                                                                                        
+         3          2         10        300 22-FEB-25 03.16.06.000000 PM                                                
+          3            3                                                                                                
+                                                                                                                        
+
+SQL> select * from customers where firstname like 'C%';
+
+        ID CUSTOMERID FIRSTNAME                                                                                         
+---------- ---------- --------------------------------------------------                                                
+LASTNAME                                                                                                                
+--------------------------------------------------                                                                      
+         3          3 Charlie                                                                                           
+CCC                                                                                                                     
+                                                                                                                        
+
+SQL> select * from customers where lastname like '%B';
+
+        ID CUSTOMERID FIRSTNAME                                                                                         
+---------- ---------- --------------------------------------------------                                                
+LASTNAME                                                                                                                
+--------------------------------------------------                                                                      
+         2          2 Bob                                                                                               
+BBB                                                                                                                     
+                                                                                                                        
+
+SQL> select * from customers where lastname like '%B';
+
+        ID CUSTOMERID FIRSTNAME                                                                                         
+---------- ---------- --------------------------------------------------                                                
+LASTNAME                                                                                                                
+--------------------------------------------------                                                                      
+         2          2 Bob                                                                                               
+BBB                                                                                                                     
+                                                                                                                        
+
+SQL> select * from products where name like 'Pen%';
+
+        ID  PRODUCTID NAME                                                    PRICE                                     
+---------- ---------- -------------------------------------------------- ----------                                     
+         1          1 Pencil                                                     10                                     
+         2          2 Pen                                                        20                                     
+
+SQL> select * from products where price <= 10;
+
+        ID  PRODUCTID NAME                                                    PRICE                                     
+---------- ---------- -------------------------------------------------- ----------                                     
+         1          1 Pencil                                                     10                                     
+         3          3 Ruler                                                     5.5                                     
+
+SQL> select * from products where id > 2;
+
+        ID  PRODUCTID NAME                                                    PRICE                                     
+---------- ---------- -------------------------------------------------- ----------                                     
+         3          3 Ruler                                                     5.5                                     
+
+SQL> select * from orders where createdat < sysdate;
+
+        ID    ORDERID   QUANTITY  PRODUCTID CREATEDAT                                                                   
+---------- ---------- ---------- ---------- --------------------------------------------------------------------------- 
+PRODUCTS_ID CUSTOMERS_ID                                                                                                
+----------- ------------                                                                                                
+         1          1         10        100 22-FEB-25 03.16.06.000000 PM                                                
+          1            1                                                                                                
+                                                                                                                        
+         2          1         15        200 22-FEB-25 03.16.06.000000 PM                                                
+          2            1                                                                                                
+                                                                                                                        
+         3          2         10        300 22-FEB-25 03.16.06.000000 PM                                                
+          3            3                                                                                                
+                                                                                                                        
+
+SQL> select * from orders where quantity > 10;
+
+        ID    ORDERID   QUANTITY  PRODUCTID CREATEDAT                                                                   
+---------- ---------- ---------- ---------- --------------------------------------------------------------------------- 
+PRODUCTS_ID CUSTOMERS_ID                                                                                                
+----------- ------------                                                                                                
+         2          1         15        200 22-FEB-25 03.16.06.000000 PM                                                
+          2            1                                                                                                
+                                                                                                                        
+
+SQL> select * from orders where customers_id = 1;
+
+        ID    ORDERID   QUANTITY  PRODUCTID CREATEDAT                                                                   
+---------- ---------- ---------- ---------- --------------------------------------------------------------------------- 
+PRODUCTS_ID CUSTOMERS_ID                                                                                                
+----------- ------------                                                                                                
+         1          1         10        100 22-FEB-25 03.16.06.000000 PM                                                
+          1            1                                                                                                
+                                                                                                                        
+         2          1         15        200 22-FEB-25 03.16.06.000000 PM                                                
+          2            1                                                                                                
+                                                                                                                        
+
+SQL> select * from reviews where rating <=4;
+
+        ID PRODUCT_ID REVIEWERID     RATING                                                                             
+---------- ---------- ---------- ----------                                                                             
+REVIEW                                                                                                                  
+------------------------------------------------------------------------------------------------------------------------
+PRODUCTS_ID                                                                                                             
+-----------                                                                                                             
+         1        100          1          1                                                                             
+Too expensive low quality                                                                                               
+          1                                                                                                             
+                                                                                                                        
+         2        200          2          2                                                                             
+No ink                                                                                                                  
+          2                                                                                                             
+                                                                                                                        
+         3        300          3          4                                                                             
+Good quality                                                                                                            
+          3                                                                                                             
+                                                                                                                        
+
+SQL> select * from reviews where lower(review) like '%good%';
+
+        ID PRODUCT_ID REVIEWERID     RATING                                                                             
+---------- ---------- ---------- ----------                                                                             
+REVIEW                                                                                                                  
+------------------------------------------------------------------------------------------------------------------------
+PRODUCTS_ID                                                                                                             
+-----------                                                                                                             
+         3        300          3          4                                                                             
+Good quality                                                                                                            
+          3                                                                                                             
+                                                                                                                        
+
+SQL> select * from reviews where products_id = 2;
+
+        ID PRODUCT_ID REVIEWERID     RATING                                                                             
+---------- ---------- ---------- ----------                                                                             
+REVIEW                                                                                                                  
+------------------------------------------------------------------------------------------------------------------------
+PRODUCTS_ID                                                                                                             
+-----------                                                                                                             
+         2        200          2          2                                                                             
+No ink                                                                                                                  
+          2                                                                                                             
+                                                                                                                        
+
+SQL> select * from reviews;
+
+        ID PRODUCT_ID REVIEWERID     RATING                                                                             
+---------- ---------- ---------- ----------                                                                             
+REVIEW                                                                                                                  
+------------------------------------------------------------------------------------------------------------------------
+PRODUCTS_ID                                                                                                             
+-----------                                                                                                             
+         1        100          1          1                                                                             
+Too expensive low quality                                                                                               
+          1                                                                                                             
+                                                                                                                        
+         2        200          2          2                                                                             
+No ink                                                                                                                  
+          2                                                                                                             
+                                                                                                                        
+         3        300          3          4                                                                             
+Good quality                                                                                                            
+          3                                                                                                             
+                                                                                                                        
+
+SQL> select * from orders;
+
+        ID    ORDERID   QUANTITY  PRODUCTID CREATEDAT                                                                   
+---------- ---------- ---------- ---------- --------------------------------------------------------------------------- 
+PRODUCTS_ID CUSTOMERS_ID                                                                                                
+----------- ------------                                                                                                
+         1          1         10        100 22-FEB-25 03.16.06.000000 PM                                                
+          1            1                                                                                                
+                                                                                                                        
+         2          1         15        200 22-FEB-25 03.16.06.000000 PM                                                
+          2            1                                                                                                
+                                                                                                                        
+         3          2         10        300 22-FEB-25 03.16.06.000000 PM                                                
+          3            3                                                                                                
+                                                                                                                        
+
+SQL> update orders set createdat = sysdate where id = 3;
+
+1 row updated.
+
+SQL> select * from orders;
+
+        ID    ORDERID   QUANTITY  PRODUCTID CREATEDAT                                                                   
+---------- ---------- ---------- ---------- --------------------------------------------------------------------------- 
+PRODUCTS_ID CUSTOMERS_ID                                                                                                
+----------- ------------                                                                                                
+         1          1         10        100 22-FEB-25 03.16.06.000000 PM                                                
+          1            1                                                                                                
+                                                                                                                        
+         2          1         15        200 22-FEB-25 03.16.06.000000 PM                                                
+          2            1                                                                                                
+                                                                                                                        
+         3          2         10        300 22-FEB-25 03.27.57.000000 PM                                                
+          3            3                                                                                                
+                                                                                                                        
+
+SQL> select * from customers where id > 1;
+
+        ID CUSTOMERID FIRSTNAME                                                                                         
+---------- ---------- --------------------------------------------------                                                
+LASTNAME                                                                                                                
+--------------------------------------------------                                                                      
+         2          2 Bob                                                                                               
+BBB                                                                                                                     
+                                                                                                                        
+         3          3 Charlie                                                                                           
+CCC                                                                                                                     
+                                                                                                                        
+
+SQL> select * from customers where (firstname = 'Bob' or lastname like '%C%');
+
+        ID CUSTOMERID FIRSTNAME                                                                                         
+---------- ---------- --------------------------------------------------                                                
+LASTNAME                                                                                                                
+--------------------------------------------------                                                                      
+         2          2 Bob                                                                                               
+BBB                                                                                                                     
+                                                                                                                        
+         3          3 Charlie                                                                                           
+CCC                                                                                                                     
+                                                                                                                        
+
+SQL> select * from products;
+
+        ID  PRODUCTID NAME                                                    PRICE                                     
+---------- ---------- -------------------------------------------------- ----------                                     
+         1          1 Pencil                                                     10                                     
+         2          2 Pen                                                        20                                     
+         3          3 Ruler                                                     5.5                                     
+
+SQL> select * from products where name = 'Pen';
+
+        ID  PRODUCTID NAME                                                    PRICE                                     
+---------- ---------- -------------------------------------------------- ----------                                     
+         2          2 Pen                                                        20                                     
+
+SQL> select * from orders;
+
+        ID    ORDERID   QUANTITY  PRODUCTID CREATEDAT                                                                   
+---------- ---------- ---------- ---------- --------------------------------------------------------------------------- 
+PRODUCTS_ID CUSTOMERS_ID                                                                                                
+----------- ------------                                                                                                
+         1          1         10        100 22-FEB-25 03.16.06.000000 PM                                                
+          1            1                                                                                                
+                                                                                                                        
+         2          1         15        200 22-FEB-25 03.16.06.000000 PM                                                
+          2            1                                                                                                
+                                                                                                                        
+         3          2         10        300 22-FEB-25 03.27.57.000000 PM                                                
+          3            3                                                                                                
+                                                                                                                        
+
+SQL> select * from orders where orderid = 2;
+
+        ID    ORDERID   QUANTITY  PRODUCTID CREATEDAT                                                                   
+---------- ---------- ---------- ---------- --------------------------------------------------------------------------- 
+PRODUCTS_ID CUSTOMERS_ID                                                                                                
+----------- ------------                                                                                                
+         3          2         10        300 22-FEB-25 03.27.57.000000 PM                                                
+          3            3                                                                                                
+                                                                                                                        
+
+SQL> select * from reviews where product_id = 300;
+
+        ID PRODUCT_ID REVIEWERID     RATING                                                                             
+---------- ---------- ---------- ----------                                                                             
+REVIEW                                                                                                                  
+------------------------------------------------------------------------------------------------------------------------
+PRODUCTS_ID                                                                                                             
+-----------                                                                                                             
+         3        300          3          4                                                                             
+Good quality                                                                                                            
+          3                                                                                                             
+                                                                                                                        
+
+SQL> 
+SQL> 
+SQL> spool off
