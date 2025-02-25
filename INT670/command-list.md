@@ -76,6 +76,11 @@ SELECT last_name FROM employees
 WHERE job_id LIKE 'M_\_%' escape "\";
 -- output: job_id = MA_ABC, MC_XYZ
 ```
+Synonym for more convenient calling
+```SQL
+create synonym hrdept for hr.departments;
+SELECT * FROM hrdept;
+```
 __________________________________________________________
 ### Datatype
 Number
@@ -178,12 +183,39 @@ flashback table table_name to before drop;
 flashback table table_name to before drop rename to new_table_name;
 ```
 __________________________________________________________
+### Administration / Privileges
+Create role
+```SQL
+create role student;
+grant alter session to student;
+grant create session to student;
+grant create procedure to student; 
+grant create trigger to student;
+grant create type to student;
+grant query rewrite to student;
+grant create any index to student;
+grant create public synonym to student;
+```
+Create user
+```SQL
+create user username01 identified by password01
+default tablespace users
+quota 10m on users  -- sete quota for each user
+grant create table, create view, create sequence, create synonym to username01;
+grant connect to username01;
+grant role_name to username01;
+```
+__________________________________________________________
 ### Transaction
 Save
 ```SQL
 savepoint save_name
 ```
-Restore
+Commit to save changes
+```SQL
+commit
+```
+Restore or rollback to revert changes
 ```SQL
 rollback to save_name
 ```
