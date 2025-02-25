@@ -7,6 +7,15 @@ spool C:\path\file_name
 // to stop record
 spool off
 ```
+Login
+```
+connect username/password
+show user
+```
+List table on the schema
+```
+SELECT * FROM tab;
+```
 Create table
 ```
 create table table_name (
@@ -15,26 +24,87 @@ create table table_name (
   ...,
   col_n_name type);
 ```
+Constraint
+```
+create table table_name (
+  col_1_name type contraint constraint_name not null PRIMARY KEY, // or set PK last
+  col_2_name type unique, //unique column level
+  ...,
+  col_n_name type,
+  CONTSTRAINT con_name PRIMARY KEY (col1)
+  CONTSTRAINT con_name FOREIGN KEY (col2) REFERENCES ref_table_name(ref_col_pk) ON DELETE [SET NULL|CASCADE]);
+
+//unique table level (composite constraint)
+create table abc (
+  col1 number(5),
+  col2 number(5),
+  unique(col1, col2));
+```
+Show table properties
+```
+desc table_name
+```
 Alter table
 ```
+alter table table_name add col_name type;
+alter table table_name drop column col_name;
+alter table table_name rename column old_name to new_name;
+alter table table_name modify col_name type;
+
+alter table table_name enable validate constraint constraint_name;
 ```
 Insert value
 ```
-insert into table_name values(
+insert into table_name (col1, col2, ..., coln) values(
   value_1,
   value_2,
   ...,
   value_n);
 ```
-Update data
+Update value
 ```
 update table_name set a = 5 where c = 40;
+```
+Delete value
+```
+delete from table_name;  //delete all data
+delete from departments where dept_name = 'Finance';
 ```
 Set special character using 'escape'
 ```
 SELECT last_name FROM employees
 WHERE job_id LIKE 'M_\_%' escape '\'
 // output: job_id = MA_ABC, MC_XYZ
+```
+__________________________________________________________
+### Datatype
+Number
+```
+> number(5,3)
+a) 1.2345    => 1.235
+b) 12.2345   => 12.235
+c) 123.45    => value larger than specified precision
+d) 12        => 12 (or 12.000)
+e) 123.4     => value larger than specified precision
+```
+Variable length
+```
+> varchar2(20)
+if data is '1234567', the rest 13 index(?) are not preserved
+```
+DATE
+```
+> date          => 08-FEB-25
+> timestamp(6)  => 08-FEB-25 01.42.13.000000 PM
+
+> interval year(2) to month
+insert "interval '33' month"    => +02-09 (2 years 9 months)
+insert "interval '330' month"   => +27-06 (27 years 6 months)
+
+> interval day(2) to second(6)
+insert "interval '2500' second"       => +00 00:41:40.000000 (41 mins 40 seconds)
+insert "interval '25 2' day to hour"  => +25 02:00:00.000000
+insert "interval '250 2' day to hour" => the leading precision of the interval is too small (because day(2))
 ```
 __________________________________________________________
 ### Formatting data when SELECT
@@ -95,6 +165,27 @@ WHERE id = &&col2;
 Undefine to removed the recorded value
 ```
 undefine col2
+```
+__________________________________________________________
+### Drop
+Drop
+```
+drop table table_name
+```
+Restore
+```
+flashback table table_name to before drop;
+flashback table table_name to before drop rename to new_table_name;
+```
+__________________________________________________________
+### Transaction
+Save
+```
+savepoint save_name
+```
+Restore
+```
+rollback to save_name
 ```
 __________________________________________________________
 ### Setting
