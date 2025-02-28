@@ -143,7 +143,7 @@ define col
 ```
 Define new word
 ```SQL
-defind a = 10
+define a = 10
 ```
 Calling the defined word
 ```SQL
