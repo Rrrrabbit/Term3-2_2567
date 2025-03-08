@@ -112,7 +112,7 @@ DATE
 -- insert "interval '250 2' day to hour" => the leading precision of the interval is too small (because day(2))
 ```
 __________________________________________________________
-### Formatting data when SELECT
+### SQL Functions (Formatting data when SELECT)
 Setting UPPERCASE, lowercase
 ```SQL
 -- UPPERCASE
