@@ -1,22 +1,22 @@
 ## Working on SQL PLUS (Oracle)
 ### Common command
-Logging
+Logging - บันทึกข้อมูล history
 ```SQL
 spool C:\path\file_name
 
 -- to stop record
 spool off
 ```
-Login
+Login - เข้าสู่ระบบ
 ```SQL
 connect username/password
 show user
 ```
-List table on the schema
+List table on the schema - แสดงตารางทั้งหมด
 ```SQL
 SELECT * FROM tab;
 ```
-Create table
+Create table - สร้างตาราง
 ```SQL
 create table table_name (
   col_1_name type,
@@ -24,7 +24,7 @@ create table table_name (
   ...,
   col_n_name type);
 ```
-Constraint
+Constraint - ข้อจำกัด ข้อบังคับ
 ```SQL
 create table table_name (
   col_1_name type contraint constraint_name not null PRIMARY KEY, -- or set PK last
@@ -88,9 +88,9 @@ Number
 > number(5,3)
 -- a) 1.2345    => 1.235
 -- b) 12.2345   => 12.235
--- c) 123.45    => value larger than specified precision
+-- c) 123.45    => ERROR: value larger than specified precision
 -- d) 12        => 12 (or 12.000)
--- e) 123.4     => value larger than specified precision
+-- e) 123.4     => ERROR: value larger than specified precision
 ```
 Variable length
 ```SQL
@@ -109,11 +109,11 @@ DATE
 > interval day(2) to second(6)
 -- insert "interval '2500' second"       => +00 00:41:40.000000 (41 mins 40 seconds)
 -- insert "interval '25 2' day to hour"  => +25 02:00:00.000000
--- insert "interval '250 2' day to hour" => the leading precision of the interval is too small (because day(2))
+-- insert "interval '250 2' day to hour" => ERROR: the leading precision of the interval is too small (because day(2))
 ```
 __________________________________________________________
 ### SQL Functions (Formatting data when SELECT)
-Setting UPPERCASE, lowercase
+Setting UPPERCASE, lowercase - ตัวอักษรพิมพ์เล็ก พิมพ์ใหญ่
 ```SQL
 -- UPPERCASE
 upper(col)
@@ -125,12 +125,115 @@ lower(col)
 -- UPPER first letter, the rest are lower
 initcap(col)
 ```
-Set null to specific value
+Set null to specific value - เปลี่ยนการแสดงค่า null
 ```SQL
 nvl(col_name, 0)
 -- change null to zero (0)
 
 SELECT nvl(price, 0) FROM products;
+```
+SUBSTRING(string, start_position, length) - ตัดข้อความ
+```SQL
+> substr('SIT KMUTT', 1, 2)   =>  'SI'
+> substr('SIT KMUTT', 3, 3)   =>  'T K'
+> substr('SIT KMUTT', -2, 3)  =>  'TT'
+> substr('SIT KMUTT', 1)      =>  'SIT KMUTT'
+> substr('SIT KMUTT', 8)      =>  'TT'
+```
+INSTR(string, character(s), start_position, nth character) - หาตำแหน่งตัวอักษร
+```SQL
+> instr('SIT KMUTT', 'I', 1, 1)   =>  2  (finding the 1st 'I' starting from the 1st character = 1st 'I' is at 2nd char)
+> instr('SIT KMUTT', 'I', 3, 1)   =>  0  (0 = couldn't find the character)
+> instr('SIT KMUTT', 'I', -3, 1)  =>  2
+> instr('SIT KMUTT', 'T', -3, 1)  =>  3
+> instr('SIT KMUTT', 'T', -1, 2)  =>  8
+> instr('SIT KMUTT', 'T')         =>  3
+```
+Left/Right padding - เติมฝั่งซ้ายขวา
+```SQL
+select lpad(last_name, 10, '%') from employees;
+-- o/p
+%%%%%%Abel
+%%%%Davies
+%%%De Haan
+
+select rpad(salary, 7, '*') from employees;
+-- o/p
+4400***
+13000**
+6000***
+```
+Trimming - ตัดหัวท้ายข้อความ
+```SQL
+> trim(leadingg 'S' from 'SIT KMUTT')      =>  'IT KMUTT'
+> trim(leadingg 'S' from 'SIT SSKMUTTSS')  =>  'IT SSKMUTTSS'
+> trim(both 'S' from 'SIT SSKMUTTSS')      =>  'IT SSKMUTT'
+> trim(both 'SI' from 'SIT SSKMUTTSS')     =>  ERROR: trim set should have only one character
+> rtrim('SIT SSKMUTTSSISI', 'SI')          =>  'SIT SSKMUTT'
+> ltrim('SIT SSKMUTTIIISSISI', 'SI')       =>  'T SSKMUTTIIISSISI'
+```
+Replacing character(s)
+```SQL
+> replace('KMKKKMTKKTKK', 'K', 'L')   =>  'LMLLLUTLLTLL'
+> replace('KMKKKMTKKTKK', 'KM', 'L')  =>  'LKKKUTKKTKK'
+> replace('JACk and JUE', 'J')        =>  'ACK and UE'
+```
+Number function
+```SQL
+> round(50.567, 2)    =>  50.57
+> round(50.567, -1)   =>  50
+> round(550.567, -2)  =>  600
+> round(50.567)       =>  51
+> round(555.567, -2)  =>  600
+> round(555.567, -1)  =>  550
+
+> trunc(50.567, 2)    =>  50.56
+> trunc(50.567, -1)   =>  50
+> trunc(550.567, -2)  =>  500
+> trunc(555.567, -2)  =>  500
+
+> mod(1600, 300)  =>  100
+```
+Date function
+```SQL
+select hire_date from employees;
+-- o/p
+03-JAN-90
+07-FEB-99
+07-JUN-94
+
+select to_char(hire_date, 'DD-MON-RRRR HH:MI:SS') from employees;
+-- o/p
+03-JAN-1990 12:00:00
+07-FEB-1999 12:00:00
+07-JUN-1994 12:00:00
+
+select to_char(hire_date, 'DD-MON-RRRR HH:MI:SS AM') from employees;
+-- o/p
+03-JAN-1990 12:00:00 AM
+07-FEB-1999 12:00:00 AM
+07-JUN-1994 12:00:00 AM
+
+> to_char(to_date('8-MAR-2025')+1, 'DD-MON-RRRR HH:MI:SS AM')       =>  09-MAR-2025 12:00:00 AM
+> to_char(to_date('8-MAR-2025')+(3/24), 'DD-MON-RRRR HH:MI:SS AM')  =>  08-MAR-2025 03:00:00 AM
+
+> months_between('01-SEP-95', '11-JAN-94')  => 19.6774194
+> add_months('31-JAN-96', 1)                => '29-FEB-96'
+> next_day('01-SEP-95', 'FRIDAY')           => '08-SEP-95'
+> last_day('01-FEB-95')                     => '28-FEB-95'
+
+month: date 1-15 round up / date 16-31 round down
+year: month 1-6 round up / month 7-12 round down
+> round(to_date('25-JUL-03'), 'month')  =>  '01-AUG-03'
+> round(to_date('25-JUL-03'), 'year')   =>  '01-JAN-04'
+> trunc(to_date('25-JUL-03'), 'month')  =>  '01-JUL-03'
+> trunc(to_date('25-JUL-03'), 'year')   =>  '01-JAN-03'
+
+> round(to_date('15-MAR-25'), 'month')  =>  '01-MAR-25'
+> round(to_date('16-MAR-25'), 'month')  =>  '01-APR-25'
+> round(to_date('16-MAY-25'), 'year')   =>  '01-JAN-25'
+> round(to_date('16-JUN-25'), 'year')   =>  '01-JAN-25'
+> round(to_date('16-JUL-25'), 'year')   =>  '01-JAN-26'
 ```
 __________________________________________________________
 ### Substitution variables
